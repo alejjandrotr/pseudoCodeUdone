@@ -1,0 +1,228 @@
+{
+  "_descripcion": "Notación completa de pseudocódigo UDONE — Universidad de Oriente. Todas las reglas, incluyendo las que coinciden con estándar general, para evitar que la IA confunda con Python, C u otros.",
+  "_version": "2.0",
+  "estructura_base": {
+    "orden": [
+      "Algoritmo <Nombre>",
+      "Declaración",
+      "  Constantes:",
+      "    <Nombre> = <Valor>",
+      "  Tipos:",
+      "    <Nombre> = <DefiniciónDeRegistro>",
+      "  Variables:",
+      "    <Nombre>: <TipoDato>",
+      "Inicio",
+      "  ...",
+      "Fin"
+    ],
+    "nota": "El nombre del algoritmo NO lleva paréntesis. La sección Declaración va ENTRE el nombre y el Inicio. 'Fin' sola cierra el bloque principal. Las secciones Constantes, Tipos y Variables son opcionales pero deben aparecer en ese orden si se usan."
+  },
+  "entrada_salida": {
+    "lectura_formato": "Leer <Variable>",
+    "escritura_formato": "Escribir \"Texto\", <Variable>",
+    "lectura_ejemplo": "Leer edad",
+    "escritura_ejemplo": "Escribir \"El resultado es: \", resultado",
+    "nota": "Usar coma para concatenar en Escribir. NO usar + ni &. Para mostrar solo texto: Escribir \"Mensaje\"."
+  },
+  "asignacion": {
+    "correcto": "<-",
+    "incorrecto": [
+      "=",
+      ":=",
+      "←"
+    ],
+    "ejemplo_correcto": "edad <- 18",
+    "ejemplo_incorrecto": "edad = 18",
+    "nota": "El signo '=' SOLO se usa para declarar el valor de una CONSTANTE en la sección Declaración. NUNCA para asignación en el cuerpo Inicio...Fin."
+  },
+  "declaracion_constantes": {
+    "formato": "<NombreConstante> = <Valor>",
+    "ejemplo": "PI = 3.1416   |   MAX_JUGADORES = 11",
+    "nota": "Aquí SÍ se usa '=' porque es una declaración fija, no una asignación dinámica."
+  },
+  "declaracion_variables": {
+    "formato": "<NombreVariable>: <TipoDato>",
+    "ejemplo": "edad: Entero",
+    "nota": "El nombre de la variable va primero, luego ':' y el tipo. Múltiples variables del mismo tipo se separan por coma: edad: Entero, promedio: Real"
+  },
+  "tipos_de_dato": {
+    "entero": {
+      "descripcion": "Números enteros, positivos o negativos, sin parte decimal.",
+      "ejemplo": "22, -5, 0"
+    },
+    "real": {
+      "descripcion": "Números con parte decimal.",
+      "ejemplo": "18.5, 3.1416, -0.5",
+      "nota": "Una división entre dos enteros SIEMPRE produce un Real."
+    },
+    "caracter": {
+      "descripcion": "Un único símbolo del teclado.",
+      "delimitador": "comillas simples ''",
+      "ejemplo": "'A', '7', '@'"
+    },
+    "cadena": {
+      "descripcion": "Secuencia de caracteres (texto).",
+      "delimitador": "comillas dobles \"\"",
+      "ejemplo": "\"Hola Mundo\", \"UDONE\""
+    },
+    "logico": {
+      "descripcion": "Booleano.",
+      "valores": [
+        "Verdadero",
+        "Falso"
+      ],
+      "prohibido": [
+        "true",
+        "false",
+        "True",
+        "False",
+        "1",
+        "0"
+      ]
+    }
+  },
+  "operadores_aritmeticos": {
+    "suma": "+",
+    "resta": "-",
+    "multiplicacion": "*",
+    "division_real": "/",
+    "div_entera": "DIV",
+    "modulo_residuo": "MOD",
+    "potenciacion": "**",
+    "prohibidos": [
+      "% (usar MOD)",
+      "// (usar DIV)",
+      "^ (usar **)"
+    ]
+  },
+  "operadores_relacionales": {
+    "igual": "=",
+    "diferente": "<>",
+    "mayor": ">",
+    "menor": "<",
+    "mayor_igual": ">=",
+    "menor_igual": "<=",
+    "prohibidos": [
+      "!= (usar <>)"
+    ],
+    "nota": "Devuelven siempre Lógico. Solo se comparan DOS miembros a la vez. Para rangos usar operadores lógicos."
+  },
+  "operadores_logicos": {
+    "and": "Y",
+    "or": "O",
+    "not": "NO",
+    "prohibidos": [
+      "AND",
+      "OR",
+      "NOT",
+      "&&",
+      "||",
+      "!"
+    ],
+    "nota": "Prioridad: primero NO, luego Y, finalmente O."
+  },
+  "concatenacion": {
+    "separador": ",",
+    "ejemplo": "Escribir \"Goles anotados: \", goles",
+    "prohibidos": [
+      "+ (operador de suma, no de concatenación)",
+      "& (no existe en UDONE)"
+    ]
+  },
+  "jerarquia_operaciones": {
+    "orden": [
+      "1. Paréntesis ( ) — de adentro hacia afuera",
+      "2. Potencia / Raíz: **",
+      "3. Multiplicación *, División /, MOD, DIV",
+      "4. Suma +, Resta -",
+      "5. Comparaciones: =, <>, >, <, >=, <=",
+      "6. Operadores Lógicos: NO, Y, O (en ese orden)"
+    ]
+  },
+  "seleccion_simple_doble": {
+    "formato": "Si <Expresión Condicional> Entonces\n  ...\nSino\n  ...\nFin Si",
+    "nota": "La rama 'Sino' es opcional. 'Fin Si' siempre cierra el bloque. Se puede anidar."
+  },
+  "seleccion_multiple": {
+    "formato": "Caso <Variable>\n  Valor1: Acción1\n  Valor2: Acción2\n  Sino: AcciónPorDefecto\nFin Caso",
+    "nota": "El 'Sino' en Caso es opcional. Usar para valores discretos, no para rangos. No lleva 'Entonces'."
+  },
+  "ciclo_repetir": {
+    "formato": "Repetir\n  ...\nHasta <Expresión Condicional>",
+    "nota": "El cuerpo se ejecuta al menos UNA vez. La condición se evalúa AL FINAL del ciclo."
+  },
+  "ciclo_mientras": {
+    "formato": "Mientras <Expresión Condicional> Hacer\n  ...\nFin Mientras",
+    "nota": "La condición se evalúa AL INICIO. Si es Falsa desde el principio, el cuerpo NO se ejecuta."
+  },
+  "ciclo_para": {
+    "formato": "Para <Variable> <- Vi Hasta Vf [Inc | Dec valor]\n  ...\nFin Para",
+    "ejemplo": "Para i <- 1 Hasta 10\n  ...\nFin Para",
+    "nota": "El incremento/decremento es OPCIONAL. Si se omite, se asume incremento de 1. La variable de control usa '<-'. NO usar '=' aquí."
+  },
+  "procedimientos": {
+    "definicion_formato": "Procedimiento <Nombre> [(Parámetros)]\n  Declaración\nInicio\n  ...\nFin Procedimiento",
+    "invocacion_formato": "Llamar <Nombre> [(Valores)]",
+    "nota": "Los procedimientos NO retornan valor. Se invocan con la palabra 'Llamar'. Pueden tener declaraciones locales."
+  },
+  "funciones": {
+    "definicion_formato": "Función <Nombre> (Parámetros): <TipoRetorno>\n  Declaración\nInicio\n  ...\nFin Función",
+    "nota": "Las funciones retornan un valor del tipo declarado. Se usan dentro de expresiones, NO se llaman con 'Llamar'."
+  },
+  "parametros_modulos": {
+    "entrada": "↓",
+    "salida": "↑",
+    "entrada_salida": "↓↑",
+    "ejemplo": "Procedimiento Calcular (↓ Entero: n, ↑ Real: resultado)",
+    "nota": "Todos los parámetros deben llevar la flecha de dirección. Sin ella es un error de notación."
+  },
+  "arreglos": {
+    "vector_formato": "Arreglo [Tamaño] de <Tipo>",
+    "vector_ejemplo": "Arreglo [10] de Entero",
+    "vector_acceso": "NombreVector[índice]",
+    "matriz_formato": "Arreglo [Filas, Columnas] de <Tipo>",
+    "matriz_ejemplo": "Arreglo [3, 4] de Real",
+    "matriz_acceso": "NombreMatriz[fila, columna]",
+    "nota": "Los índices comienzan en 1 por convención en UDONE, a menos que se especifique otro rango."
+  },
+  "registros": {
+    "definicion_formato": "Registro de\n  <TipoDato>: <Campo1>\n  <TipoDato>: <Campo2>\nFin Registro",
+    "acceso": "Variable.Campo",
+    "nota": "Los tipos Registro se declaran en la sección 'Tipos' de la Declaración, no en Variables."
+  },
+  "archivos": {
+    "declaracion": "Archivo de Tipo <NombreTipoRegistro>",
+    "operaciones": [
+      "Conectar",
+      "Abrir",
+      "Crear",
+      "Leer",
+      "Grabar",
+      "Cerrar",
+      "Eliminar",
+      "Renombrar"
+    ],
+    "nota": "Los archivos se declaran como Variables. Se deben Conectar antes de cualquier operación."
+  },
+  "nomenclatura_identificadores": {
+    "inicio": "Debe comenzar con una letra (mayúscula o minúscula)",
+    "caracteres_permitidos": [
+      "letras",
+      "numeros",
+      "_ (guion_bajo)"
+    ],
+    "prohibidos": [
+      "espacios en blanco",
+      "guion medio -",
+      "$",
+      "%",
+      "@",
+      "?",
+      "¿",
+      "!",
+      "¡"
+    ],
+    "recomendacion": "CamelCase (nombreEstudiante) o MAYUSCULAS_CON_PISO para constantes (MAX_INTENTOS)",
+    "nota": "En evaluaciones escritas NO se penaliza diferencia mayúsculas/minúsculas. Un identificador no puede ser igual a una palabra reservada del pseudocódigo."
+  }
+}
