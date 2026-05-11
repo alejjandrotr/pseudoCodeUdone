@@ -27,7 +27,8 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const [selectedProfId, setSelectedProfId] = useState(professorsData[0].id);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [consoleOutput, setConsoleOutput] = useState("");
-  const [usage, setUsage] = useState<{ promptTokens: number; completionTokens: number; totalTokens: number } | undefined>(undefined);
+  const [usage, setUsage] = useState<{ promptTokens: number; completionTokens: number; totalTokens: number; cachedTokens?: number } | undefined>(undefined);
+  const [wasCached, setWasCached] = useState(false);
 
   const selectedProfessor = professorsData.find(p => p.id === selectedProfId) || professorsData[0];
 
@@ -61,6 +62,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       );
       setConsoleOutput(response.text);
       setUsage(response.usage);
+      setWasCached(response.cached);
     } catch (error: any) {
       if (error.message === "API_KEY_INVALID" || error.message === "API_KEY_MISSING") {
         setConsoleOutput("ERROR CRÍTICO: La API Key guardada no es válida o expiró. Abre la configuración.");
@@ -177,10 +179,18 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                 {consoleOutput && <Console output={consoleOutput} />}
                 
                 {usage && (
-                  <div className="flex justify-end gap-4 text-[10px] font-mono text-slate-500 mt-2 bg-slate-900/30 p-2 rounded-lg border border-slate-800/50 animate-fade-in">
+                  <div className="flex flex-wrap justify-end gap-3 text-[10px] font-mono text-slate-500 mt-2 bg-slate-900/30 p-2 rounded-lg border border-slate-800/50 animate-fade-in">
+                    {wasCached && (
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                        ⚡ Caché
+                      </span>
+                    )}
                     <span>Prompt: <span className="text-slate-300">{usage.promptTokens}</span> tk</span>
+                    {usage.cachedTokens !== undefined && usage.cachedTokens > 0 && (
+                      <span>Cacheados: <span className="text-emerald-400">{usage.cachedTokens}</span> tk</span>
+                    )}
                     <span>Respuesta: <span className="text-slate-300">{usage.completionTokens}</span> tk</span>
-                    <span className="border-l border-slate-700 pl-4 font-bold text-brand-400/80">Total: {usage.totalTokens} tokens</span>
+                    <span className="border-l border-slate-700 pl-3 font-bold text-brand-400/80">Total: {usage.totalTokens} tokens</span>
                   </div>
                 )}
               </div>
