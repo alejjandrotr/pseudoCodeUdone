@@ -51,15 +51,15 @@ export const Header: React.FC<{
   onNavigate?: (view: any) => void;
   showButtons?: boolean;
 }> = ({ onNavigate, showButtons }) => (
-  <header className="relative py-16 px-6 max-w-5xl mx-auto text-center space-y-6 animate-fade-in z-10">
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-sm text-sm text-slate-300 mb-4 hover:border-brand-500/50 transition-colors cursor-default">
+  <header className="relative py-8 md:py-16 px-4 md:px-6 max-w-5xl mx-auto text-center space-y-4 md:space-y-6 animate-fade-in z-10">
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-sm text-xs md:text-sm text-slate-300 mb-2 md:mb-4 hover:border-brand-500/50 transition-colors cursor-default">
       <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
       Universidad de Oriente • Licenciatura en Informática
     </div>
-    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white">
+    <h1 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white">
       Notación para Algoritmos en <span className="text-brand-400">Pseudocódigo</span>
     </h1>
-    <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+    <p className="text-base md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
       Guía de referencia estándar para la asignatura Algoritmos y Estructuras de Datos I. Núcleo Nueva Esparta.
     </p>
 

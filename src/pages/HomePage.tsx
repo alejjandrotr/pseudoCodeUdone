@@ -36,7 +36,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       />
 
       {/* Two-column layout */}
-      <div className="max-w-7xl mx-auto px-4 pb-24 relative z-10 flex-grow flex gap-6 w-full">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full">
         {/* Sidebar */}
         <ArticleSidebar
           articles={fundamentosArticles}
