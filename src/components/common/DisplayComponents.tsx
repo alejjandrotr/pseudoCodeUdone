@@ -15,13 +15,30 @@ interface ConsoleProps {
   output: string;
 }
 
-export const Console: React.FC<ConsoleProps> = ({ output }) => (
-  <div className="mt-6 bg-black border-l-4 border-brand-500 rounded-r-lg p-4 font-mono text-xs md:text-sm shadow-xl animate-slide-up">
-    <div className="flex items-center gap-2 mb-3 text-slate-500 uppercase tracking-widest text-[10px]">
-      <TerminalSquare size={14} /> Consola de Evaluación
+export const Console: React.FC<ConsoleProps> = ({ output }) => {
+  const renderOutput = () => {
+    return output.split('\n').map((line, i) => {
+      // Check for errors
+      if (line.match(/error\s*:/i)) {
+        return <div key={i} className="text-red-400">{line}</div>;
+      }
+      // Check for suggestions/observations
+      if (line.match(/(sugerencia|observación|observacion|recomendación|recomendacion)\s*:/i)) {
+        return <div key={i} className="text-blue-400">{line}</div>;
+      }
+      // Default formatting
+      return <div key={i}>{line}</div>;
+    });
+  };
+
+  return (
+    <div className="mt-6 bg-black border-l-4 border-brand-500 rounded-r-lg p-4 font-mono text-xs md:text-sm shadow-xl animate-slide-up">
+      <div className="flex items-center gap-2 mb-3 text-slate-500 uppercase tracking-widest text-[10px]">
+        <TerminalSquare size={14} /> Consola de Evaluación
+      </div>
+      <div className="text-green-400 whitespace-pre-wrap leading-relaxed font-mono">
+        {renderOutput()}
+      </div>
     </div>
-    <pre className="text-green-400 whitespace-pre-wrap leading-relaxed">
-      {output}
-    </pre>
-  </div>
-);
+  );
+};

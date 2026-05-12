@@ -5,6 +5,7 @@ import { Button } from "../components/common/Button";
 import { Console } from "../components/common/DisplayComponents";
 import { evaluarPseudocodigo } from "../core/services/aiEvaluationService";
 import { professorsData } from "../core/data/professorsData";
+import { useSelectedProfessor } from "../core/hooks/useSelectedProfessor";
 
 interface CustomExercisePageProps {
   onBack: () => void;
@@ -14,7 +15,7 @@ export const CustomExercisePage: React.FC<CustomExercisePageProps> = ({ onBack }
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [enunciado, setEnunciado] = useState("");
   const [userCode, setUserCode] = useState("");
-  const [selectedProfId, setSelectedProfId] = useState(professorsData[0].id);
+  const [selectedProfId, setSelectedProfId] = useSelectedProfessor();
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [consoleOutput, setConsoleOutput] = useState("");
   const [usage, setUsage] = useState<{ promptTokens: number; completionTokens: number; totalTokens: number } | undefined>(undefined);

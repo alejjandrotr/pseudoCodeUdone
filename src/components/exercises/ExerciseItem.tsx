@@ -6,6 +6,7 @@ import { LanguageTab } from "./ExerciseComponents";
 import { CodeBlock, Console } from "../common/DisplayComponents";
 import { Button } from "../common/Button";
 import { professorsData } from "../../core/data/professorsData";
+import { useSelectedProfessor } from "../../core/hooks/useSelectedProfessor";
 
 interface ExerciseItemProps extends Exercise {
   openSettings: () => void;
@@ -24,7 +25,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
   // Sandbox State
   const [userCode, setUserCode] = useState("");
-  const [selectedProfId, setSelectedProfId] = useState(professorsData[0].id);
+  const [selectedProfId, setSelectedProfId] = useSelectedProfessor();
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [consoleOutput, setConsoleOutput] = useState("");
   const [usage, setUsage] = useState<{ promptTokens: number; completionTokens: number; totalTokens: number; cachedTokens?: number } | undefined>(undefined);
