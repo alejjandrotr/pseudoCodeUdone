@@ -20,7 +20,7 @@ import { fundamentosArticles } from '../core/data/fundamentosData';
 import { Article } from '../core/types/article';
 
 interface HomePageProps {
-  onNavigate: (view: 'acciones_basicas' | 'ejercicios_secuenciacion' | 'professors' | 'custom_exercise') => void;
+  onNavigate: (view: 'acciones_basicas' | 'ejercicios_secuenciacion' | 'professors' | 'custom_exercise' | 'flow_demo') => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
@@ -92,6 +92,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <div>
                     <h3 className="text-xl font-semibold text-brand-200 mb-3">Selección Simple y Doble</h3>
                     <CodeBlock code={`Si Expresión Condicional Entonces\n  // Acciones si verdadero\nSino\n  // Acciones alternativas (Opcional)\nFin Si`} />
+                    <div className="mt-4">
+                      <Button variant="secondary" onClick={() => onNavigate('flow_demo')} icon={Terminal}>
+                        Laboratorio Interactivo de Flujo (Demo)
+                      </Button>
+                    </div>
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-brand-200 mb-3">Selección Múltiple</h3>

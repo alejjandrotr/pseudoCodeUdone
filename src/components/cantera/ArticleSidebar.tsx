@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Article } from '../../core/types/article';
 import { 
   ChevronRight, 
+  ChevronDown,
   BookOpen, 
   FlaskConical, 
   PlayCircle, 
@@ -42,6 +43,24 @@ const SidebarContent: React.FC<{
     return acc;
   }, {});
 
+  // State to track which categories are expanded
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(() => {
+    // By default, expand the category of the active article
+    if (activeArticle) {
+      return { [activeArticle.category]: true };
+    }
+    // Or expand the first one
+    const firstCat = Object.keys(grouped)[0];
+    return firstCat ? { [firstCat]: true } : {};
+  });
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
   const handleSelect = (article: Article) => {
     onSelect(article);
     onClose?.();
@@ -50,21 +69,33 @@ const SidebarContent: React.FC<{
   return (
     <>
       <div className="glass-panel overflow-hidden">
-        {Object.entries(grouped).map(([category, arts]) => (
-          <div key={category}>
-            {/* Category Header */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-slate-800/40 border-b border-slate-700/50">
-              <span className="text-brand-400">
-                {categoryIcons[category] ?? <BookOpen size={14} />}
-              </span>
-              <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                {category}
-              </span>
-            </div>
+        {Object.entries(grouped).map(([category, arts]) => {
+          const isExpanded = expandedCategories[category];
+          
+          return (
+            <div key={category} className="border-b border-slate-700/30 last:border-0">
+              {/* Category Header */}
+              <button
+                onClick={() => toggleCategory(category)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-slate-800/40 hover:bg-slate-800/60 transition-colors text-left group"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-brand-400 group-hover:scale-110 transition-transform">
+                    {categoryIcons[category] ?? <BookOpen size={14} />}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-slate-200 transition-colors">
+                    {category}
+                  </span>
+                </div>
+                <span className={`text-slate-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                  <ChevronDown size={14} />
+                </span>
+              </button>
 
-            {/* Article Items */}
-            <ul className="py-2">
-              {arts.map((article) => {
+              {/* Article Items (Collapsible) */}
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <ul className="py-2 bg-slate-900/40">
+                  {arts.map((article) => {
                 const isActive = activeArticle?.id === article.id;
                 const isExercise = article.type === 'exercise';
                 
@@ -103,10 +134,12 @@ const SidebarContent: React.FC<{
                     </button>
                   </li>
                 );
-              })}
-            </ul>
-          </div>
-        ))}
+                  })}
+                </ul>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Decorative gradient */}
