@@ -26,11 +26,9 @@ export interface FlowDiagramProps {
 // ─── Layout constants ─────────────────────────────────────────────────────────
 
 const CANVAS_W = 420;
-const NODE_H = 44;
-const CIRCLE_R = 22;
-const DIAMOND_SIZE = 32;
-const ROW_GAP = 80;
-const BRANCH_X_OFFSET = 110; // horizontal offset for condition branches
+const CIRCLE_R = 6;
+const DIAMOND_SIZE = 10;
+const ROW_GAP = 50;
 
 // ─── We compute node positions using a simple vertical layout ─────────────────
 
@@ -68,20 +66,12 @@ function buildLayout(nodes: FlowNode[], edges: FlowEdge[]): Record<string, Posit
 
 function getNodePath(node: FlowNode, pos: Position): string {
   const { x, y } = pos;
-  if (node.type === 'start' || node.type === 'end') {
-    return `M ${x - CIRCLE_R} ${y} A ${CIRCLE_R} ${CIRCLE_R} 0 1 1 ${x + CIRCLE_R} ${y} A ${CIRCLE_R} ${CIRCLE_R} 0 1 1 ${x - CIRCLE_R} ${y}`;
-  }
   if (node.type === 'condition') {
     const s = DIAMOND_SIZE;
     return `M ${x} ${y - s} L ${x + s * 1.6} ${y} L ${x} ${y + s} L ${x - s * 1.6} ${y} Z`;
   }
-  if (node.type === 'io') {
-    const hw = 65; const hh = NODE_H / 2; const sk = 12;
-    return `M ${x - hw + sk} ${y - hh} L ${x + hw} ${y - hh} L ${x + hw - sk} ${y + hh} L ${x - hw} ${y + hh} Z`;
-  }
-  // process (rectangle with rounded corners via path)
-  const hw = 65; const hh = NODE_H / 2; const r = 8;
-  return `M ${x - hw + r} ${y - hh} Q ${x - hw} ${y - hh} ${x - hw} ${y - hh + r} L ${x - hw} ${y + hh - r} Q ${x - hw} ${y + hh} ${x - hw + r} ${y + hh} L ${x + hw - r} ${y + hh} Q ${x + hw} ${y + hh} ${x + hw} ${y + hh - r} L ${x + hw} ${y - hh + r} Q ${x + hw} ${y - hh} ${x + hw - r} ${y - hh} Z`;
+  // Default to a circle for start, end, process, io
+  return `M ${x - CIRCLE_R} ${y} A ${CIRCLE_R} ${CIRCLE_R} 0 1 1 ${x + CIRCLE_R} ${y} A ${CIRCLE_R} ${CIRCLE_R} 0 1 1 ${x - CIRCLE_R} ${y}`;
 }
 
 function nodeCenter(node: FlowNode, pos: Position): [number, number] {
@@ -89,21 +79,19 @@ function nodeCenter(node: FlowNode, pos: Position): [number, number] {
 }
 
 function nodeBottom(node: FlowNode, pos: Position): [number, number] {
-  if (node.type === 'start' || node.type === 'end') return [pos.x, pos.y + CIRCLE_R];
   if (node.type === 'condition') return [pos.x, pos.y + DIAMOND_SIZE];
-  return [pos.x, pos.y + NODE_H / 2];
+  return [pos.x, pos.y + CIRCLE_R];
 }
 
 function nodeTop(node: FlowNode, pos: Position): [number, number] {
-  if (node.type === 'start' || node.type === 'end') return [pos.x, pos.y - CIRCLE_R];
   if (node.type === 'condition') return [pos.x, pos.y - DIAMOND_SIZE];
-  return [pos.x, pos.y - NODE_H / 2];
+  return [pos.x, pos.y - CIRCLE_R];
 }
 
 function nodeSide(node: FlowNode, pos: Position, dir: 'left' | 'right'): [number, number] {
   const dx = dir === 'right' ? 1 : -1;
   if (node.type === 'condition') return [pos.x + dx * DIAMOND_SIZE * 1.6, pos.y];
-  return [pos.x + dx * 65, pos.y];
+  return [pos.x + dx * CIRCLE_R, pos.y];
 }
 
 // ─── Color themes ─────────────────────────────────────────────────────────────
@@ -252,18 +240,6 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
               filter={active ? 'url(#glow)' : undefined}
               style={{ transition: 'all 0.3s' }}
             />
-            <text
-              x={p.x}
-              y={p.y + 1}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill={active ? fill : '#94a3b8'}
-              fontSize="11"
-              fontWeight={active ? 'bold' : 'normal'}
-              style={{ transition: 'fill 0.3s' }}
-            >
-              {node.label}
-            </text>
           </g>
         );
       })}

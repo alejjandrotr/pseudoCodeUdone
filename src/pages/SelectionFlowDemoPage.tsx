@@ -23,10 +23,26 @@ const FLOW_EDGES: FlowEdge[] = [
   { from: 'print_impar', to: 'end' },
 ];
 
-// ─── Interactive Execution Steps ──────────────────────────────────────────────
+// ─── Code and Steps ─────────────────────────────────────────────────────────
+
+const PSEUDO_CODE = `Algoritmo ParImpar
+  Variables:
+    num: Entero
+Inicio
+  Escribir "Ingrese un numero:"
+  Leer num
+  Si (num MOD 2 = 0) Entonces
+    Escribir "PAR"
+  Sino
+    Escribir "IMPAR"
+  Fin Si
+Fin`;
+
+const CODE_LINES = PSEUDO_CODE.split('\n');
 
 interface ExecutionStep {
   nodeId: string;
+  line: number;
   action?: 'wait_input' | 'print' | 'eval_cond' | 'end';
   variable?: string;
   output?: string;
@@ -35,19 +51,20 @@ interface ExecutionStep {
 }
 
 const EXECUTION_PLAN: Record<string, ExecutionStep> = {
-  'start': { nodeId: 'start', action: 'print', output: '> Iniciando algoritmo...' },
-  'io_read': { nodeId: 'io_read', action: 'wait_input', variable: 'num' },
+  'start': { nodeId: 'start', line: 4, action: 'print', output: '> Iniciando algoritmo...' },
+  'io_read': { nodeId: 'io_read', line: 6, action: 'wait_input', variable: 'num' },
   'cond_par': { 
     nodeId: 'cond_par', 
+    line: 7,
     action: 'eval_cond',
     evalNext: (vars) => {
       const isPar = Number(vars.num) % 2 === 0;
       return isPar ? 'print_par' : 'print_impar';
     }
   },
-  'print_par': { nodeId: 'print_par', action: 'print', output: 'El número es PAR' },
-  'print_impar': { nodeId: 'print_impar', action: 'print', output: 'El número es IMPAR' },
-  'end': { nodeId: 'end', action: 'end', output: '> Fin del algoritmo.' },
+  'print_par': { nodeId: 'print_par', line: 8, action: 'print', output: 'El número es PAR' },
+  'print_impar': { nodeId: 'print_impar', line: 10, action: 'print', output: 'El número es IMPAR' },
+  'end': { nodeId: 'end', line: 12, action: 'end', output: '> Fin del algoritmo.' },
 };
 
 interface SelectionFlowDemoPageProps {
@@ -187,8 +204,31 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column: Visual Flow */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column: Code View */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-0 flex flex-col overflow-hidden min-h-[400px]">
+            <div className="bg-slate-800/80 px-4 py-3 flex items-center justify-between border-b border-slate-700">
+              <span className="text-sm font-mono text-slate-400">pseudocodigo.udone</span>
+            </div>
+            <div className="p-4 font-mono text-[13px] text-slate-300 overflow-y-auto flex-1">
+              {CODE_LINES.map((line, idx) => {
+                const lineNumber = idx + 1;
+                const isActive = activeNodeId && EXECUTION_PLAN[activeNodeId]?.line === lineNumber;
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex gap-4 px-2 py-1 transition-colors rounded-sm ${isActive ? 'bg-brand-500/20 text-white border-l-2 border-brand-400' : 'border-l-2 border-transparent text-slate-400'}`}
+                  >
+                    <span className="text-slate-600 select-none w-4 text-right flex-shrink-0">{lineNumber}</span>
+                    <span className="whitespace-pre">{line}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Middle Column: Visual Flow */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
             
             {/* Diagram Component */}
