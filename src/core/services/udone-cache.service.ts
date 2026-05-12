@@ -148,7 +148,7 @@ export async function getOrCreateUdoneCache(
   apiKey: string,
   modelName: string
 ): Promise<string | null> {
-  const storeKey = `${apiKey}:${modelName}`;
+  const storeKey = `${apiKey}:${modelName}:v2`;
   const existing = cacheStore.get(storeKey);
 
   // Cache hit — still valid
@@ -164,7 +164,7 @@ export async function getOrCreateUdoneCache(
       config: {
         systemInstruction: UDONE_RULES,
         ttl: "3600s", // 1 hour
-        displayName: "udone-rules-v1",
+        displayName: "udone-rules-v2",
       },
     });
 

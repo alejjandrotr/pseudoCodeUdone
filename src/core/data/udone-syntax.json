@@ -41,9 +41,9 @@
     "nota": "Aquí SÍ se usa '=' porque es una declaración fija, no una asignación dinámica."
   },
   "declaracion_variables": {
-    "formato": "<NombreVariable>: <TipoDato>",
-    "ejemplo": "edad: Entero",
-    "nota": "El nombre de la variable va primero, luego ':' y el tipo. Múltiples variables del mismo tipo se separan por coma: edad: Entero, promedio: Real"
+    "formato": "<NombreVariable> [, <NombreVariable>...]: <TipoDato>",
+    "ejemplo": "edad, cantidad: Entero",
+    "nota": "Se pueden declarar múltiples variables del mismo tipo separadas por coma ANTES de los dos puntos (ej: var1, var2: Entero). El nombre de la variable va primero, luego ':' y el tipo."
   },
   "tipos_de_dato": {
     "entero": {
@@ -223,6 +223,6 @@
       "¡"
     ],
     "recomendacion": "CamelCase (nombreEstudiante) o MAYUSCULAS_CON_PISO para constantes (MAX_INTENTOS)",
-    "nota": "En evaluaciones escritas NO se penaliza diferencia mayúsculas/minúsculas. Un identificador no puede ser igual a una palabra reservada del pseudocódigo."
+    "nota": "El uso de guion_bajo (_) está COMPLETAMENTE PERMITIDO en variables y nombres de módulos, NO lo marques como error. Solo puedes darlo como sugerencia opcional de estilo. En evaluaciones escritas NO se penaliza diferencia mayúsculas/minúsculas."
   }
 }
