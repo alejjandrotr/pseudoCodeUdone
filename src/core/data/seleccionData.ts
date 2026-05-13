@@ -3,6 +3,10 @@ import { ArticleSeleccionIntroduccion } from '../../components/cantera/articles/
 import { ArticleSeleccionSimple } from '../../components/cantera/articles/ArticleSeleccionSimple';
 import { ArticleVideoSeleccionSimple } from '../../components/cantera/articles/ArticleVideoSeleccionSimple';
 import { ArticleSeleccionDoble } from '../../components/cantera/articles/ArticleSeleccionDoble';
+import { ArticleVideoSeleccionDoble } from '../../components/cantera/articles/ArticleVideoSeleccionDoble';
+import { ArticleVideoAnidacion } from '../../components/cantera/articles/ArticleVideoAnidacion';
+import { ArticleSeleccionMultiple } from '../../components/cantera/articles/ArticleSeleccionMultiple';
+import { ArticleVideoSeleccionMultiple } from '../../components/cantera/articles/ArticleVideoSeleccionMultiple';
 
 export const seleccionArticles: Article[] = [
   {
@@ -40,5 +44,41 @@ export const seleccionArticles: Article[] = [
     summary: 'Cómo manejar alternativas con Si-Sino y el concepto fundamental de la anidación.',
     component: ArticleSeleccionDoble,
     type: 'lesson',
+  },
+  {
+    id: 'seleccion-video-02',
+    slug: 'video-apoyo-seleccion-doble',
+    title: 'Apoyo Visual: Selección Doble',
+    category: 'Estructuras de Selección',
+    summary: 'Explicación del uso de alternativas (Sino) y el reto de la suma de dos números.',
+    component: ArticleVideoSeleccionDoble,
+    type: 'video',
+  },
+  {
+    id: 'seleccion-video-03',
+    slug: 'video-anidacion',
+    title: 'Apoyo Visual: Anidación',
+    category: 'Estructuras de Selección',
+    summary: 'Video sobre el concepto de anidamiento y la clasificación de triángulos.',
+    component: ArticleVideoAnidacion,
+    type: 'video',
+  },
+  {
+    id: 'seleccion-04',
+    slug: '04-seleccion-multiple',
+    title: 'Selección Múltiple (Caso)',
+    category: 'Estructuras de Selección',
+    summary: 'Uso de la estructura Caso para manejar múltiples opciones específicas de forma organizada.',
+    component: ArticleSeleccionMultiple,
+    type: 'lesson',
+  },
+  {
+    id: 'seleccion-video-04',
+    slug: 'video-apoyo-seleccion-multiple',
+    title: 'Apoyo Visual: Selección Múltiple',
+    category: 'Estructuras de Selección',
+    summary: 'Video sobre el funcionamiento de la estructura Caso y el ejercicio de los días de la semana.',
+    component: ArticleVideoSeleccionMultiple,
+    type: 'video',
   }
 ];

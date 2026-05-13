@@ -47,15 +47,17 @@ Fin Si`} />
       <InteractiveFlowExercise 
         title="Ejercicio: Determinar Par o Impar"
         nodes={[
-          { id: 'start', type: 'start', label: 'Inicio', x: 100, y: 40 },
-          { id: 'io_read', type: 'io', label: 'Leer num', x: 100, y: 110 },
-          { id: 'cond_par', type: 'condition', label: 'num MOD 2 = 0', x: 100, y: 180 },
-          { id: 'print_par', type: 'io', label: 'Escribir "Es PAR"', x: 180, y: 250 },
-          { id: 'print_impar', type: 'io', label: 'Escribir "Es IMPAR"', x: 20, y: 250 },
-          { id: 'end', type: 'end', label: 'Fin', x: 100, y: 320 }
+          { id: 'start', type: 'start', label: 'Inicio', x: 100, y: 30 },
+          { id: 'io_print', type: 'io', label: 'Escribir', x: 100, y: 80 },
+          { id: 'io_read', type: 'io', label: 'Leer num', x: 100, y: 130 },
+          { id: 'cond_par', type: 'condition', label: 'num MOD 2 = 0', x: 100, y: 200 },
+          { id: 'print_par', type: 'io', label: 'Escribir "Es PAR"', x: 180, y: 270 },
+          { id: 'print_impar', type: 'io', label: 'Escribir "Es IMPAR"', x: 20, y: 270 },
+          { id: 'end', type: 'end', label: 'Fin', x: 100, y: 340 }
         ]}
         edges={[
-          { from: 'start', to: 'io_read' },
+          { from: 'start', to: 'io_print' },
+          { from: 'io_print', to: 'io_read' },
           { from: 'io_read', to: 'cond_par' },
           { from: 'cond_par', to: 'print_par', label: 'V' },
           { from: 'cond_par', to: 'print_impar', label: 'F' },
@@ -64,7 +66,9 @@ Fin Si`} />
         ]}
         code={[
           'Algoritmo ParImpar',
-          '  Variables: num: Entero',
+          'Declaración',
+          '  Variables:',
+          '    num: Entero',
           'Inicio',
           '  Escribir "Ingrese un número:"',
           '  Leer num',
@@ -76,17 +80,18 @@ Fin Si`} />
           'Fin'
         ]}
         plan={{
-          start: { nodeId: 'start', line: 3, action: 'print', output: '> Iniciando...' },
-          io_read: { nodeId: 'io_read', line: 5, action: 'wait_input', variable: 'num', output: 'Ingrese un número:' },
+          start: { nodeId: 'start', line: 5, action: 'print', output: '> Iniciando...' },
+          io_print: { nodeId: 'io_print', line: 6, action: 'print', output: 'Ingrese un número:' },
+          io_read: { nodeId: 'io_read', line: 7, action: 'wait_input', variable: 'num', output: '' },
           cond_par: { 
             nodeId: 'cond_par', 
-            line: 6, 
+            line: 8, 
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.num) % 2 === 0 ? 'print_par' : 'print_impar')
           },
-          print_par: { nodeId: 'print_par', line: 7, action: 'print', output: 'El número es PAR' },
-          print_impar: { nodeId: 'print_impar', line: 9, action: 'print', output: 'El número es IMPAR' },
-          end: { nodeId: 'end', line: 11, action: 'end', output: '> Fin del algoritmo.' }
+          print_par: { nodeId: 'print_par', line: 9, action: 'print', output: 'El número es PAR' },
+          print_impar: { nodeId: 'print_impar', line: 11, action: 'print', output: 'El número es IMPAR' },
+          end: { nodeId: 'end', line: 13, action: 'end', output: '> Fin del algoritmo.' }
         }}
         initialMemory={[{ name: 'num', value: null, type: 'number' }]}
       />
@@ -100,27 +105,33 @@ Fin Si`} />
       <InteractiveFlowExercise 
         title="Ejercicio: El Mayor de Tres Números"
         nodes={[
-          { id: 'start', type: 'start', label: 'Inicio', x: 200, y: 30 },
-          { id: 'io_1', type: 'io', label: 'Leer n1', x: 200, y: 80 },
-          { id: 'io_2', type: 'io', label: 'Leer n2', x: 200, y: 130 },
-          { id: 'io_3', type: 'io', label: 'Leer n3', x: 200, y: 180 },
-          { id: 'cond_1', type: 'condition', label: 'n1 > n2', x: 200, y: 250 },
+          { id: 'start', type: 'start', label: 'Inicio', x: 200, y: 20 },
+          { id: 'io_p1', type: 'io', label: 'Escribir', x: 200, y: 60 },
+          { id: 'io_1', type: 'io', label: 'Leer n1', x: 200, y: 100 },
+          { id: 'io_p2', type: 'io', label: 'Escribir', x: 200, y: 140 },
+          { id: 'io_2', type: 'io', label: 'Leer n2', x: 200, y: 180 },
+          { id: 'io_p3', type: 'io', label: 'Escribir', x: 200, y: 220 },
+          { id: 'io_3', type: 'io', label: 'Leer n3', x: 200, y: 260 },
+          { id: 'cond_1', type: 'condition', label: 'n1 > n2', x: 200, y: 320 },
           
-          { id: 'cond_1v', type: 'condition', label: 'n1 > n3', x: 310, y: 320 },
-          { id: 'cond_1f', type: 'condition', label: 'n2 > n3', x: 90, y: 320 },
+          { id: 'cond_1v', type: 'condition', label: 'n1 > n3', x: 310, y: 380 },
+          { id: 'cond_1f', type: 'condition', label: 'n2 > n3', x: 90, y: 380 },
           
-          { id: 'print_n1', type: 'io', label: 'Escribir n1', x: 350, y: 410 },
-          { id: 'print_n3a', type: 'io', label: 'Escribir n3', x: 270, y: 410 },
+          { id: 'print_n1', type: 'io', label: 'Escribir n1', x: 350, y: 460 },
+          { id: 'print_n3a', type: 'io', label: 'Escribir n3', x: 270, y: 460 },
           
-          { id: 'print_n2', type: 'io', label: 'Escribir n2', x: 50, y: 410 },
-          { id: 'print_n3b', type: 'io', label: 'Escribir n3', x: 130, y: 410 },
+          { id: 'print_n2', type: 'io', label: 'Escribir n2', x: 50, y: 460 },
+          { id: 'print_n3b', type: 'io', label: 'Escribir n3', x: 130, y: 460 },
           
-          { id: 'end', type: 'end', label: 'Fin', x: 200, y: 500 }
+          { id: 'end', type: 'end', label: 'Fin', x: 200, y: 540 }
         ]}
         edges={[
-          { from: 'start', to: 'io_1' },
-          { from: 'io_1', to: 'io_2' },
-          { from: 'io_2', to: 'io_3' },
+          { from: 'start', to: 'io_p1' },
+          { from: 'io_p1', to: 'io_1' },
+          { from: 'io_1', to: 'io_p2' },
+          { from: 'io_p2', to: 'io_2' },
+          { from: 'io_2', to: 'io_p3' },
+          { from: 'io_p3', to: 'io_3' },
           { from: 'io_3', to: 'cond_1' },
           
           { from: 'cond_1', to: 'cond_1v', label: 'V' },
@@ -139,7 +150,9 @@ Fin Si`} />
         ]}
         code={[
           'Algoritmo MayorDeTres',
-          '  Variables: n1, n2, n3: Entero',
+          'Declaración',
+          '  Variables:',
+          '    n1, n2, n3: Entero',
           'Inicio',
           '  Escribir "Ingrese n1:"',
           '  Leer n1',
@@ -163,33 +176,36 @@ Fin Si`} />
           'Fin'
         ]}
         plan={{
-          start: { nodeId: 'start', line: 3, action: 'print', output: '> Iniciando...' },
-          io_1: { nodeId: 'io_1', line: 5, action: 'wait_input', variable: 'n1', output: 'Ingrese n1:' },
-          io_2: { nodeId: 'io_2', line: 7, action: 'wait_input', variable: 'n2', output: 'Ingrese n2:' },
-          io_3: { nodeId: 'io_3', line: 9, action: 'wait_input', variable: 'n3', output: 'Ingrese n3:' },
+          start: { nodeId: 'start', line: 5, action: 'print', output: '> Iniciando...' },
+          io_p1: { nodeId: 'io_p1', line: 6, action: 'print', output: 'Ingrese n1:' },
+          io_1: { nodeId: 'io_1', line: 7, action: 'wait_input', variable: 'n1', output: '' },
+          io_p2: { nodeId: 'io_p2', line: 8, action: 'print', output: 'Ingrese n2:' },
+          io_2: { nodeId: 'io_2', line: 9, action: 'wait_input', variable: 'n2', output: '' },
+          io_p3: { nodeId: 'io_p3', line: 10, action: 'print', output: 'Ingrese n3:' },
+          io_3: { nodeId: 'io_3', line: 11, action: 'wait_input', variable: 'n3', output: '' },
           cond_1: { 
             nodeId: 'cond_1', 
-            line: 10, 
+            line: 12, 
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.n1) > Number(vars.n2) ? 'cond_1v' : 'cond_1f')
           },
           cond_1v: { 
             nodeId: 'cond_1v', 
-            line: 11, 
+            line: 13, 
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.n1) > Number(vars.n3) ? 'print_n1' : 'print_n3a')
           },
           cond_1f: { 
             nodeId: 'cond_1f', 
-            line: 17, 
+            line: 19, 
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.n2) > Number(vars.n3) ? 'print_n2' : 'print_n3b')
           },
-          print_n1: { nodeId: 'print_n1', line: 12, action: 'print', output: 'El mayor es n1' },
-          print_n3a: { nodeId: 'print_n3a', line: 14, action: 'print', output: 'El mayor es n3' },
-          print_n2: { nodeId: 'print_n2', line: 18, action: 'print', output: 'El mayor es n2' },
-          print_n3b: { nodeId: 'print_n3b', line: 20, action: 'print', output: 'El mayor es n3' },
-          end: { nodeId: 'end', line: 23, action: 'end', output: '> Fin.' }
+          print_n1: { nodeId: 'print_n1', line: 14, action: 'print', output: 'El mayor es n1' },
+          print_n3a: { nodeId: 'print_n3a', line: 16, action: 'print', output: 'El mayor es n3' },
+          print_n2: { nodeId: 'print_n2', line: 20, action: 'print', output: 'El mayor es n2' },
+          print_n3b: { nodeId: 'print_n3b', line: 22, action: 'print', output: 'El mayor es n3' },
+          end: { nodeId: 'end', line: 25, action: 'end', output: '> Fin.' }
         }}
         initialMemory={[
           { name: 'n1', value: null, type: 'number' },

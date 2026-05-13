@@ -103,18 +103,22 @@ Fin Si`} />
       <InteractiveFlowExercise 
         title="Ejercicio: Mayor de dos números"
         nodes={[
-          { id: 'start', type: 'start', label: 'Inicio', x: 100, y: 40 },
-          { id: 'io_1', type: 'io', label: 'Leer num1', x: 100, y: 110 },
-          { id: 'io_2', type: 'io', label: 'Leer num2', x: 100, y: 180 },
-          { id: 'cond_1', type: 'condition', label: 'num1 > num2', x: 100, y: 250 },
-          { id: 'print_1', type: 'io', label: 'Escribir "N1 Mayor"', x: 180, y: 320 },
-          { id: 'cond_2', type: 'condition', label: 'num2 > num1', x: 100, y: 390 },
-          { id: 'print_2', type: 'io', label: 'Escribir "N2 Mayor"', x: 180, y: 460 },
-          { id: 'end', type: 'end', label: 'Fin', x: 100, y: 530 }
+          { id: 'start', type: 'start', label: 'Inicio', x: 100, y: 30 },
+          { id: 'io_p1', type: 'io', label: 'Escribir', x: 100, y: 80 },
+          { id: 'io_1', type: 'io', label: 'Leer num1', x: 100, y: 130 },
+          { id: 'io_p2', type: 'io', label: 'Escribir', x: 100, y: 180 },
+          { id: 'io_2', type: 'io', label: 'Leer num2', x: 100, y: 230 },
+          { id: 'cond_1', type: 'condition', label: 'num1 > num2', x: 100, y: 300 },
+          { id: 'print_1', type: 'io', label: 'Escribir "N1 Mayor"', x: 180, y: 370 },
+          { id: 'cond_2', type: 'condition', label: 'num2 > num1', x: 100, y: 440 },
+          { id: 'print_2', type: 'io', label: 'Escribir "N2 Mayor"', x: 180, y: 510 },
+          { id: 'end', type: 'end', label: 'Fin', x: 100, y: 580 }
         ]}
         edges={[
-          { from: 'start', to: 'io_1' },
-          { from: 'io_1', to: 'io_2' },
+          { from: 'start', to: 'io_p1' },
+          { from: 'io_p1', to: 'io_1' },
+          { from: 'io_1', to: 'io_p2' },
+          { from: 'io_p2', to: 'io_2' },
           { from: 'io_2', to: 'cond_1' },
           { from: 'cond_1', to: 'print_1', label: 'V' },
           { from: 'cond_1', to: 'cond_2', label: 'F' },
@@ -125,7 +129,9 @@ Fin Si`} />
         ]}
         code={[
           'Algoritmo MayorDeDosNumeros',
-          '  Variables: num1, num2: Entero',
+          'Declaración',
+          '  Variables:',
+          '    num1, num2: Entero',
           'Inicio',
           '  Escribir "Indique el número 1:"',
           '  Leer num1',
@@ -140,24 +146,26 @@ Fin Si`} />
           'Fin'
         ]}
         plan={{
-          start: { nodeId: 'start', line: 3, action: 'print', output: '> Iniciando...' },
-          io_1: { nodeId: 'io_1', line: 5, action: 'wait_input', variable: 'num1', output: 'Indique el número 1:' },
-          io_2: { nodeId: 'io_2', line: 7, action: 'wait_input', variable: 'num2', output: 'Indique el número 2:' },
+          start: { nodeId: 'start', line: 5, action: 'print', output: '> Iniciando...' },
+          io_p1: { nodeId: 'io_p1', line: 6, action: 'print', output: 'Indique el número 1:' },
+          io_1: { nodeId: 'io_1', line: 7, action: 'wait_input', variable: 'num1', output: '' },
+          io_p2: { nodeId: 'io_p2', line: 8, action: 'print', output: 'Indique el número 2:' },
+          io_2: { nodeId: 'io_2', line: 9, action: 'wait_input', variable: 'num2', output: '' },
           cond_1: { 
             nodeId: 'cond_1', 
-            line: 8, 
+            line: 10, 
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.num1) > Number(vars.num2) ? 'print_1' : 'cond_2')
           },
-          print_1: { nodeId: 'print_1', line: 9, action: 'print', output: 'El primero es el mayor' },
+          print_1: { nodeId: 'print_1', line: 11, action: 'print', output: 'El primero es el mayor' },
           cond_2: { 
             nodeId: 'cond_2', 
-            line: 11, 
+            line: 13, 
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.num2) > Number(vars.num1) ? 'print_2' : 'end')
           },
-          print_2: { nodeId: 'print_2', line: 12, action: 'print', output: 'El segundo es el mayor' },
-          end: { nodeId: 'end', line: 14, action: 'end', output: '> Fin del algoritmo.' }
+          print_2: { nodeId: 'print_2', line: 14, action: 'print', output: 'El segundo es el mayor' },
+          end: { nodeId: 'end', line: 16, action: 'end', output: '> Fin del algoritmo.' }
         }}
         initialMemory={[
           { name: 'num1', value: null, type: 'number' },

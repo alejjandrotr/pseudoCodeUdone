@@ -136,15 +136,17 @@ Fin`} />
       <InteractiveFlowExercise 
         title="Laboratorio: Alerta de Velocidad"
         nodes={[
-          { id: 'start', type: 'start', label: 'Inicio', x: 100, y: 40 },
-          { id: 'io_read', type: 'io', label: 'Leer velocidad', x: 100, y: 110 },
-          { id: 'cond_vel', type: 'condition', label: 'velocidad > 80', x: 100, y: 180 },
-          { id: 'print_warn', type: 'io', label: 'Escribir "ADVERTENCIA"', x: 180, y: 250 },
-          { id: 'print_end', type: 'io', label: 'Escribir "Fin..."', x: 100, y: 320 },
-          { id: 'end', type: 'end', label: 'Fin', x: 100, y: 390 }
+          { id: 'start', type: 'start', label: 'Inicio', x: 100, y: 30 },
+          { id: 'io_print', type: 'io', label: 'Escribir', x: 100, y: 80 },
+          { id: 'io_read', type: 'io', label: 'Leer velocidad', x: 100, y: 130 },
+          { id: 'cond_vel', type: 'condition', label: 'velocidad > 80', x: 100, y: 200 },
+          { id: 'print_warn', type: 'io', label: 'Escribir "ADVERTENCIA"', x: 180, y: 270 },
+          { id: 'print_end', type: 'io', label: 'Escribir "Fin..."', x: 100, y: 340 },
+          { id: 'end', type: 'end', label: 'Fin', x: 100, y: 410 }
         ]}
         edges={[
-          { from: 'start', to: 'io_read' },
+          { from: 'start', to: 'io_print' },
+          { from: 'io_print', to: 'io_read' },
           { from: 'io_read', to: 'cond_vel' },
           { from: 'cond_vel', to: 'print_warn', label: 'V' },
           { from: 'cond_vel', to: 'print_end', label: 'F' },
@@ -153,6 +155,7 @@ Fin`} />
         ]}
         code={[
           'Algoritmo Alerta_Velocidad',
+          'Declaración',
           '  Variables:',
           '    velocidad: Real',
           'Inicio',
@@ -165,17 +168,18 @@ Fin`} />
           'Fin'
         ]}
         plan={{
-          start: { nodeId: 'start', line: 4, action: 'print', output: '> Iniciando algoritmo...' },
-          io_read: { nodeId: 'io_read', line: 6, action: 'wait_input', variable: 'velocidad', output: 'Ingrese la velocidad actual (km/h): ' },
+          start: { nodeId: 'start', line: 5, action: 'print', output: '> Iniciando algoritmo...' },
+          io_print: { nodeId: 'io_print', line: 6, action: 'print', output: 'Ingrese la velocidad actual (km/h): ' },
+          io_read: { nodeId: 'io_read', line: 7, action: 'wait_input', variable: 'velocidad', output: '' },
           cond_vel: {
             nodeId: 'cond_vel',
-            line: 7,
+            line: 8,
             action: 'eval_cond',
             evalNext: (vars) => (Number(vars.velocidad) > 80 ? 'print_warn' : 'print_end')
           },
-          print_warn: { nodeId: 'print_warn', line: 8, action: 'print', output: '¡ADVERTENCIA! Estás excediendo el límite permitido.' },
-          print_end: { nodeId: 'print_end', line: 10, action: 'print', output: 'Fin del monitoreo.' },
-          end: { nodeId: 'end', line: 11, action: 'end', output: '> Fin del algoritmo.' }
+          print_warn: { nodeId: 'print_warn', line: 9, action: 'print', output: '¡ADVERTENCIA! Estás excediendo el límite permitido.' },
+          print_end: { nodeId: 'print_end', line: 11, action: 'print', output: 'Fin del monitoreo.' },
+          end: { nodeId: 'end', line: 12, action: 'end', output: '> Fin del algoritmo.' }
         }}
         initialMemory={[{ name: 'velocidad', value: null, type: 'number' }]}
       />
