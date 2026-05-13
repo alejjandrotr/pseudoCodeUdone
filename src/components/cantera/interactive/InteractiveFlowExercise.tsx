@@ -33,6 +33,7 @@ export const InteractiveFlowExercise: React.FC<InteractiveFlowExerciseProps> = (
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
   const [activeEdge, setActiveEdge] = useState<{from: string, to: string} | null>(null);
   const [visitedEdges, setVisitedEdges] = useState<{from: string, to: string}[]>([]);
+  const [isHoverEnabled, setIsHoverEnabled] = useState(true);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isWaitingInput, setIsWaitingInput] = useState(false);
@@ -157,13 +158,56 @@ export const InteractiveFlowExercise: React.FC<InteractiveFlowExerciseProps> = (
     setTimeout(() => setHighlightedNodeId(null), 2000);
   };
 
+  const handleNodeHover = (nodeId: string | null) => {
+    if (isHoverEnabled) {
+      setHighlightedNodeId(nodeId);
+    }
+  };
+
   return (
     <div className="w-full text-slate-200 mt-8 mb-8 border border-slate-700/50 rounded-xl overflow-hidden shadow-2xl bg-slate-900">
-      {title && (
-        <div className="bg-slate-800/80 px-4 py-3 border-b border-slate-700">
-          <h3 className="font-bold text-brand-300">{title}</h3>
+      <div className="bg-slate-800/80 px-4 py-3 border-b border-slate-700 flex items-center justify-between flex-wrap gap-3">
+        {title && <h3 className="font-bold text-brand-300">{title}</h3>}
+        
+        {/* Top Controls Bar */}
+        <div className="flex items-center gap-3">
+           {/* Hover Toggle */}
+           <button 
+             onClick={() => setIsHoverEnabled(!isHoverEnabled)}
+             className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full transition-all border ${
+               isHoverEnabled 
+                ? 'bg-sky-500/20 text-sky-400 border-sky-500/50' 
+                : 'bg-slate-700/50 text-slate-500 border-slate-600/50'
+             }`}
+             title="Activar/Desactivar resaltado al pasar el mouse"
+           >
+             <div className={`w-2 h-2 rounded-full ${isHoverEnabled ? 'bg-sky-400 animate-pulse' : 'bg-slate-600'}`} />
+             Hover: {isHoverEnabled ? 'ON' : 'OFF'}
+           </button>
+
+           <div className="h-6 w-px bg-slate-700 mx-1" />
+
+           <button 
+             onClick={handleReset}
+             className="p-2 bg-slate-800 text-slate-400 hover:text-white rounded-lg transition-colors border border-slate-700 hover:border-slate-500"
+             title="Reiniciar ejecución"
+           >
+             <RotateCcw size={16} />
+           </button>
+           <button 
+             onClick={startExecution}
+             disabled={isWaitingInput}
+             className={`flex items-center gap-2 px-4 py-1.5 text-sm font-bold rounded-lg transition-colors border ${
+               isPlaying 
+                ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 hover:bg-amber-500/30' 
+                : 'bg-brand-500/20 text-brand-400 border-brand-500/50 hover:bg-brand-500/30'
+             } disabled:opacity-50 disabled:cursor-not-allowed`}
+           >
+             <Play size={14} className={isPlaying ? 'hidden' : 'block'} />
+             {isPlaying ? 'Pausar' : 'Ejecutar'}
+           </button>
         </div>
-      )}
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-0">
         
@@ -206,30 +250,8 @@ export const InteractiveFlowExercise: React.FC<InteractiveFlowExerciseProps> = (
               activeEdge={activeEdge}
               visitedEdges={visitedEdges}
               onNodeClick={handleNodeClick}
+              onNodeHover={handleNodeHover}
             />
-            
-            {/* Controls Overlay */}
-            <div className="absolute top-4 right-4 flex gap-2 z-20">
-               <button 
-                 onClick={handleReset}
-                 className="p-2 bg-slate-800 text-slate-400 hover:text-white rounded-lg transition-colors border border-slate-700 hover:border-slate-500"
-                 title="Reiniciar"
-               >
-                 <RotateCcw size={16} />
-               </button>
-               <button 
-                 onClick={startExecution}
-                 disabled={isWaitingInput}
-                 className={`flex items-center gap-2 px-3 py-1.5 text-sm font-bold rounded-lg transition-colors border ${
-                   isPlaying 
-                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 hover:bg-amber-500/30' 
-                    : 'bg-brand-500/20 text-brand-400 border-brand-500/50 hover:bg-brand-500/30'
-                 } disabled:opacity-50 disabled:cursor-not-allowed`}
-               >
-                 <Play size={14} className={isPlaying ? 'hidden' : 'block'} />
-                 {isPlaying ? 'Pausar' : 'Ejecutar'}
-               </button>
-            </div>
           </div>
         </div>
 

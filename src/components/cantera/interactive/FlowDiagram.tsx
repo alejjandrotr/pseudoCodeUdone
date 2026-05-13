@@ -26,6 +26,7 @@ export interface FlowDiagramProps {
   activeEdge?: { from: string; to: string } | null;
   visitedEdges?: { from: string; to: string }[];
   onNodeClick?: (nodeId: string) => void;
+  onNodeHover?: (nodeId: string | null) => void;
 }
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
@@ -186,6 +187,7 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
   activeEdge,
   visitedEdges = [],
   onNodeClick,
+  onNodeHover,
 }) => {
   const pos = buildLayout(nodes, edges);
   const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
@@ -380,6 +382,8 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
             key={node.id} 
             style={{ transition: 'opacity 0.2s', cursor: onNodeClick ? 'pointer' : 'default' }}
             onClick={() => onNodeClick && onNodeClick(node.id)}
+            onMouseEnter={() => onNodeHover && onNodeHover(node.id)}
+            onMouseLeave={() => onNodeHover && onNodeHover(null)}
           >
             <path
               d={getNodePath(node, p)}
