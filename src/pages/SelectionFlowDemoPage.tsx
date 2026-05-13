@@ -52,7 +52,7 @@ interface ExecutionStep {
 
 const EXECUTION_PLAN: Record<string, ExecutionStep> = {
   'start': { nodeId: 'start', line: 4, action: 'print', output: '> Iniciando algoritmo...' },
-  'io_read': { nodeId: 'io_read', line: 6, action: 'wait_input', variable: 'num' },
+  'io_read': { nodeId: 'io_read', line: 6, action: 'wait_input', variable: 'num', output: 'Ingrese un número:' },
   'cond_par': { 
     nodeId: 'cond_par', 
     line: 7,
@@ -68,13 +68,14 @@ const EXECUTION_PLAN: Record<string, ExecutionStep> = {
 };
 
 interface SelectionFlowDemoPageProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ onBack }) => {
   // ─── State ────────────────────────────────────────────────────────────────
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
-  const [activeEdgeFrom, setActiveEdgeFrom] = useState<string | null>(null);
+  const [activeEdge, setActiveEdge] = useState<{from: string, to: string} | null>(null);
+  const [visitedEdges, setVisitedEdges] = useState<{from: string, to: string}[]>([]);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isWaitingInput, setIsWaitingInput] = useState(false);
@@ -114,14 +115,18 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
     if (step.action === 'eval_cond' && step.evalNext) {
       const varsDict = memory.reduce((acc, v) => ({ ...acc, [v.name]: v.value }), {});
       const target = step.evalNext(varsDict);
-      setActiveEdgeFrom(currentId);
+      const edge = { from: currentId, to: target };
+      setActiveEdge(edge);
+      setVisitedEdges(prev => [...prev, edge]);
       return target;
     }
     
     // Default: find the next edge
     const nextEdge = FLOW_EDGES.find(e => e.from === currentId);
     if (nextEdge) {
-      setActiveEdgeFrom(currentId);
+      const edge = { from: currentId, to: nextEdge.to };
+      setActiveEdge(edge);
+      setVisitedEdges(prev => [...prev, edge]);
       return nextEdge.to;
     }
     
@@ -138,6 +143,9 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
       setConsoleHistory(prev => [...prev, { type: 'out', text: step.output! }]);
     }
     else if (step.action === 'wait_input') {
+      if (step.output) {
+        setConsoleHistory(prev => [...prev, { type: 'out', text: step.output! }]);
+      }
       setIsPlaying(false);
       setIsWaitingInput(true);
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -145,37 +153,38 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
     else if (step.action === 'end' && step.output) {
       setConsoleHistory(prev => [...prev, { type: 'out', text: step.output! }]);
       setIsPlaying(false);
-      setTimeout(() => setActiveEdgeFrom(null), 500); // Clear edge highlight
+      setTimeout(() => setActiveEdge(null), 500); // Clear edge highlight
     }
   };
 
   const handleInputSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isWaitingInput) return;
+    if (!inputValue.trim()) return;
 
-    const val = inputValue.trim();
-    if (val === '') return;
+    const numValue = Number(inputValue);
+    const step = EXECUTION_PLAN[activeNodeId!];
     
-    const parsedVal = isNaN(Number(val)) ? val : Number(val);
+    if (step && step.variable) {
+      setMemory(prev => prev.map(v => 
+        v.name === step.variable ? { ...v, value: isNaN(numValue) ? inputValue : numValue } : v
+      ));
+    }
 
-    setConsoleHistory(prev => [...prev, { type: 'in', text: val }]);
-    
-    // Update memory for 'num'
-    setMemory(prev => prev.map(v => v.name === 'num' ? { ...v, value: parsedVal } : v));
-
+    setConsoleHistory(prev => [...prev, { type: 'in', text: `> ${inputValue}` }]);
     setInputValue('');
     setIsWaitingInput(false);
-    setIsPlaying(true); // Resume
+    setIsPlaying(true);
   };
 
   const handleReset = () => {
     setActiveNodeId(null);
-    setActiveEdgeFrom(null);
+    setActiveEdge(null);
+    setVisitedEdges([]);
     setIsPlaying(false);
     setIsWaitingInput(false);
-    setConsoleHistory([]);
-    setMemory([{ name: 'num', value: null, type: 'number' }]);
     setInputValue('');
+    setMemory([{ name: 'num', value: null, type: 'number' }]);
+    setConsoleHistory([]);
   };
 
   const startExecution = () => {
@@ -191,13 +200,15 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className={onBack ? "min-h-screen bg-slate-950 text-slate-200" : "w-full text-slate-200 mt-8"}>
+      <div className={onBack ? "max-w-6xl mx-auto px-6 py-12" : "w-full"}>
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <button onClick={onBack} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
-            <ArrowLeft size={20} />
-          </button>
+          {onBack && (
+            <button onClick={onBack} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
+              <ArrowLeft size={20} />
+            </button>
+          )}
           <div>
             <h1 className="text-2xl font-bold text-white">Laboratorio de Flujo: Par o Impar</h1>
             <p className="text-slate-400 text-sm">Visualizador interactivo de estructuras de selección.</p>
@@ -215,7 +226,8 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
                  nodes={FLOW_NODES} 
                  edges={FLOW_EDGES} 
                  activeNodeId={activeNodeId} 
-                 activeEdgeFrom={activeEdgeFrom} 
+                 activeEdge={activeEdge} 
+                 visitedEdges={visitedEdges}
                />
             </div>
 

@@ -18,7 +18,7 @@ Declaración
     Constantes:
         <Nombre> = <Valor>
     Variables:
-        <Tipo_de_dato>: <Nombre_Variable>
+        <Nombre_Variable>: <Tipo_de_dato>
 
 Inicio
     // Aquí van las acciones y operaciones
@@ -79,8 +79,8 @@ Declaración
     Constantes:
         MAYORIA = 18
     Variables:
-        Entero: edad
-        Lógico: es_mayor
+        edad: Entero
+        es_mayor: Lógico
 
 Inicio
     Leer edad

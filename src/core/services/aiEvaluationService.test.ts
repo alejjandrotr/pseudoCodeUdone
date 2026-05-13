@@ -39,6 +39,7 @@ describe('aiEvaluationService', () => {
     name: 'Dr. Test',
     difficultyLevel: 'Fácil',
     promptBehavior: 'Sé muy amable y explica todo paso a paso.',
+    shortStory: 'Un profesor de prueba para tests unitarios.',
   };
 
   beforeEach(() => {

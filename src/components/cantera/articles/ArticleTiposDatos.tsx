@@ -255,9 +255,15 @@ export const ArticleTiposDatos: React.FC = () => (
         <NumberedItem n={1} label="Paréntesis ( )">
           Rompen cualquier regla y se resuelven de adentro hacia afuera.
         </NumberedItem>
-        <NumberedItem n={2} label="Potencia / Raíz" />
-        <NumberedItem n={3} label="Multiplicación, División, MOD, DIV" />
-        <NumberedItem n={4} label="Suma y Resta" />
+        <NumberedItem n={2} label="Potencia / Raíz">
+          Cálculos de exponentes y radicales.
+        </NumberedItem>
+        <NumberedItem n={3} label="Multiplicación, División, MOD, DIV">
+          Operaciones de producto y cocientes (tanto exactos como enteros).
+        </NumberedItem>
+        <NumberedItem n={4} label="Suma y Resta">
+          Las operaciones aritméticas más básicas de adición y sustracción.
+        </NumberedItem>
         <NumberedItem n={5} label="Comparaciones">
           =, &lt;&gt;, &gt;, &lt;, &gt;=, &lt;=
         </NumberedItem>

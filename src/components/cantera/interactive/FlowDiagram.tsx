@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -8,6 +9,8 @@ export interface FlowNode {
   id: string;
   type: NodeType;
   label: string;
+  x?: number;
+  y?: number;
 }
 
 export interface FlowEdge {
@@ -20,15 +23,18 @@ export interface FlowDiagramProps {
   nodes: FlowNode[];
   edges: FlowEdge[];
   activeNodeId?: string | null;
-  activeEdgeFrom?: string | null; // id of the FROM node of the active edge
+  activeEdge?: { from: string; to: string } | null;
+  visitedEdges?: { from: string; to: string }[];
+  onNodeClick?: (nodeId: string) => void;
 }
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
 
-const CANVAS_W = 420;
-const CIRCLE_R = 6;
-const DIAMOND_SIZE = 10;
-const ROW_GAP = 50;
+const CANVAS_W = 400; // Increased width for scrollability and complex branching
+const CIRCLE_R = 12;
+const DIAMOND_SIZE = 16;
+const ROW_GAP = 70;
+const BRANCH_OFFSET = 45;
 
 // ─── We compute node positions using a simple vertical layout ─────────────────
 
@@ -38,25 +44,74 @@ function buildLayout(nodes: FlowNode[], edges: FlowEdge[]): Record<string, Posit
   const pos: Record<string, Position> = {};
   const cx = CANVAS_W / 2;
 
-  // Build adjacency for topological sort
-  const inDeg: Record<string, number> = {};
-  const adj: Record<string, string[]> = {};
-  nodes.forEach(n => { inDeg[n.id] = 0; adj[n.id] = []; });
-  edges.forEach(e => { adj[e.from].push(e.to); inDeg[e.to] = (inDeg[e.to] || 0) + 1; });
+  // 1. Use manual positions if provided
+  const unpositioned = nodes.filter(n => {
+    if (n.x !== undefined && n.y !== undefined) {
+      pos[n.id] = { x: n.x, y: n.y };
+      return false;
+    }
+    return true;
+  });
 
-  // Kahn's BFS topological
-  const queue: string[] = nodes.filter(n => !inDeg[n.id]).map(n => n.id);
-  const order: string[] = [];
-  while (queue.length) {
-    const cur = queue.shift()!;
-    order.push(cur);
-    adj[cur].forEach(next => { inDeg[next]--; if (!inDeg[next]) queue.push(next); });
+  if (unpositioned.length === 0) return pos;
+
+  // Identify branch targets
+  const branchEdges = edges.filter(e => e.label === 'V' || e.label === 'F');
+  const siNodes = branchEdges.filter(e => e.label === 'V').map(e => e.to);
+  const noNodes = branchEdges.filter(e => e.label === 'F').map(e => e.to);
+
+  // Map to find which node comes after the branch nodes
+  const joinNodes = nodes.filter(n => {
+    const inEdges = edges.filter(e => e.to === n.id);
+    return inEdges.length > 1; // Nodes where paths rejoin
+  }).map(n => n.id);
+
+  // We'll do a simple custom layout for this specific structure:
+  // start -> io -> cond -> (left/right branches) -> end
+  let currentY = 40;
+  
+  // 1. Start
+  const start = nodes.find(n => n.type === 'start');
+  if (start) {
+    pos[start.id] = { x: cx, y: currentY };
+    currentY += ROW_GAP;
   }
 
-  let y = 60;
-  order.forEach(id => {
-    pos[id] = { x: cx, y };
-    y += ROW_GAP;
+  // 2. IO/Read
+  const io = nodes.find(n => n.type === 'io' && !siNodes.includes(n.id) && !noNodes.includes(n.id));
+  if (io) {
+    pos[io.id] = { x: cx, y: currentY };
+    currentY += ROW_GAP;
+  }
+
+  // 3. Condition
+  const cond = nodes.find(n => n.type === 'condition');
+  if (cond) {
+    pos[cond.id] = { x: cx, y: currentY };
+    
+    // 4. Branches (at the same Y level)
+    const branchY = currentY + ROW_GAP;
+    siNodes.forEach(id => {
+      pos[id] = { x: cx - BRANCH_OFFSET, y: branchY };
+    });
+    noNodes.forEach(id => {
+      pos[id] = { x: cx + BRANCH_OFFSET, y: branchY };
+    });
+    
+    currentY = branchY + ROW_GAP;
+  }
+
+  // 5. End (Join)
+  const end = nodes.find(n => n.type === 'end' || joinNodes.includes(n.id));
+  if (end && !pos[end.id]) {
+    pos[end.id] = { x: cx, y: currentY };
+  }
+
+  // Final fallback: Ensure EVERY node has a position to avoid crashes
+  nodes.forEach((n, i) => {
+    if (!pos[n.id]) {
+      pos[n.id] = { x: cx, y: 100 + i * ROW_GAP };
+    }
   });
 
   return pos;
@@ -128,34 +183,96 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
   nodes,
   edges,
   activeNodeId,
-  activeEdgeFrom,
+  activeEdge,
+  visitedEdges = [],
+  onNodeClick,
 }) => {
   const pos = buildLayout(nodes, edges);
   const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Compute canvas height dynamically
-  const maxY = Math.max(...nodes.map(n => pos[n.id]?.y ?? 0)) + 80;
+  const maxY = Math.max(0, ...nodes.map(n => pos[n.id]?.y ?? 0)) + 80;
 
-  const isEdgeActive = (e: FlowEdge) => activeEdgeFrom === e.from;
+  const isEdgeActive = (e: FlowEdge) => activeEdge?.from === e.from && activeEdge?.to === e.to;
+  const isEdgeVisited = (e: FlowEdge) => visitedEdges.some(v => v.from === e.from && v.to === e.to);
+
+  const [zoom, setZoom] = useState(1);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
+  const handleResetZoom = () => setZoom(1);
 
   return (
-    <svg
-      ref={svgRef}
-      width="100%"
-      viewBox={`0 0 ${CANVAS_W} ${maxY}`}
-      className="select-none"
-      style={{ fontFamily: 'monospace' }}
-    >
+    <div className="relative group w-full h-full overflow-auto custom-scrollbar flex justify-center">
+      {/* Zoom Controls (Moved to top-left to avoid overlap with Run controls) */}
+      <div className="absolute top-2 left-2 flex flex-col gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button 
+          onClick={handleZoomIn}
+          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md border border-slate-700 shadow-xl"
+          title="Zoom In"
+        >
+          <ZoomIn size={16} />
+        </button>
+        <button 
+          onClick={handleZoomOut}
+          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md border border-slate-700 shadow-xl"
+          title="Zoom Out"
+        >
+          <ZoomOut size={16} />
+        </button>
+        <button 
+          onClick={handleResetZoom}
+          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md border border-slate-700 shadow-xl"
+          title="Reset Zoom"
+        >
+          <Maximize2 size={16} />
+        </button>
+      </div>
+
+      <svg
+        ref={svgRef}
+        width={CANVAS_W * zoom}
+        height={maxY * zoom}
+        viewBox={`0 0 ${CANVAS_W} ${maxY}`}
+        className="select-none flex-shrink-0"
+        style={{ 
+          fontFamily: 'monospace',
+          transition: 'all 0.2s ease-out',
+        }}
+      >
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
           <path d="M0,0 L0,6 L8,3 Z" fill="#64748b" />
         </marker>
+        <marker id="arrowhead-v" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 Z" fill="#3e5c4b" />
+        </marker>
+        <marker id="arrowhead-f" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 Z" fill="#5c3e3e" />
+        </marker>
         <marker id="arrowhead-active" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
           <path d="M0,0 L0,6 L8,3 Z" fill="#00ff88" />
         </marker>
-        <filter id="glow">
+        <marker id="arrowhead-error" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 Z" fill="#ff4444" />
+        </marker>
+        <marker id="arrowhead-visited" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 Z" fill="#10b981" />
+        </marker>
+        <marker id="arrowhead-visited-f" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 Z" fill="#ef4444" />
+        </marker>
+        <filter id="glow" filterUnits="userSpaceOnUse" x="-1000" y="-1000" width="3000" height="3000">
           <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <filter id="glow-error" filterUnits="userSpaceOnUse" x="-1000" y="-1000" width="3000" height="3000">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <filter id="glow-visited" filterUnits="userSpaceOnUse" x="-1000" y="-1000" width="3000" height="3000">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
@@ -167,8 +284,28 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
         if (!fromNode || !toNode || !pos[edge.from] || !pos[edge.to]) return null;
 
         const active = isEdgeActive(edge);
-        const color = active ? '#00ff88' : '#475569';
-        const strokeW = active ? 2.5 : 1.5;
+        const visited = isEdgeVisited(edge);
+        const isFalso = edge.label === 'F';
+        const isVerdadero = edge.label === 'V';
+        
+        // Grayish but lighter tones for inactive condition lines
+        const inactiveColor = isFalso ? '#7f1d1d' : isVerdadero ? '#14532d' : '#64748b';
+        
+        let color = inactiveColor;
+        if (active) color = isFalso ? '#ff4444' : '#00ff88';
+        else if (visited) color = isFalso ? '#ef4444' : '#10b981'; // Retain bright color for history
+
+        const strokeW = active ? 2.5 : visited ? 2 : 1.5;
+        
+        let marker = 'url(#arrowhead)';
+        if (active) marker = isFalso ? 'url(#arrowhead-error)' : 'url(#arrowhead-active)';
+        else if (visited) marker = isFalso ? 'url(#arrowhead-visited-f)' : 'url(#arrowhead-visited)';
+        else if (isFalso) marker = 'url(#arrowhead-f)';
+        else if (isVerdadero) marker = 'url(#arrowhead-v)';
+
+        let filter = undefined;
+        if (active) filter = isFalso ? 'url(#glow-error)' : 'url(#glow)';
+        else if (visited) filter = 'url(#glow-visited)';
 
         // Decide routing: straight down or branching sideways
         const fromPos = pos[edge.from];
@@ -184,14 +321,23 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
           pathD = `M ${x1} ${y1} L ${x2} ${y2}`;
           labelX = x1 + 8;
           labelY = (y1 + y2) / 2;
-        } else {
-          // Branching: go sideways from condition
+        } else if (fromNode.type === 'condition') {
+          // Branching OUT: go sideways from condition, then down
           const side = toPos.x > fromPos.x ? 'right' : 'left';
           const [sx, sy] = nodeSide(fromNode, fromPos, side);
           const [tx, ty] = nodeTop(toNode, toPos);
           pathD = `M ${sx} ${sy} L ${toPos.x} ${sy} L ${tx} ${ty}`;
           labelX = sx + (side === 'right' ? 8 : -8);
           labelY = sy - 10;
+        } else {
+          // Joining IN: go down from process/io, then sideways
+          const [bx, by] = nodeBottom(fromNode, fromPos);
+          const [tx, ty] = nodeTop(toNode, toPos);
+          // Reduced shared vertical segment to 6px to avoid collisions with central lines
+          const joinY = ty - 6;
+          pathD = `M ${bx} ${by} L ${bx} ${joinY} L ${tx} ${joinY} L ${tx} ${ty}`;
+          labelX = bx + (bx > tx ? 8 : -16);
+          labelY = (by + joinY) / 2;
         }
 
         return (
@@ -201,16 +347,16 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
               fill="none"
               stroke={color}
               strokeWidth={strokeW}
-              markerEnd={active ? 'url(#arrowhead-active)' : 'url(#arrowhead)'}
+              markerEnd={marker}
               style={{ transition: 'stroke 0.3s, stroke-width 0.3s' }}
-              filter={active ? 'url(#glow)' : undefined}
+              filter={filter}
             />
             {edge.label && (
               <text
                 x={labelX}
                 y={labelY}
-                fill={active ? '#00ff88' : '#94a3b8'}
-                fontSize="11"
+                fill={active ? color : '#94a3b8'}
+                fontSize="9"
                 fontWeight="bold"
               >
                 {edge.label}
@@ -230,7 +376,11 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
         const fillOp = nodeFillOpacity(active);
 
         return (
-          <g key={node.id} style={{ transition: 'opacity 0.2s' }}>
+          <g 
+            key={node.id} 
+            style={{ transition: 'opacity 0.2s', cursor: onNodeClick ? 'pointer' : 'default' }}
+            onClick={() => onNodeClick && onNodeClick(node.id)}
+          >
             <path
               d={getNodePath(node, p)}
               fill={fill}
@@ -244,5 +394,6 @@ export const FlowDiagram: React.FC<FlowDiagramProps> = ({
         );
       })}
     </svg>
+    </div>
   );
 };

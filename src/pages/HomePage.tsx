@@ -17,6 +17,7 @@ import { Button } from '../components/common/Button';
 import { ArticleSidebar } from '../components/cantera/ArticleSidebar';
 import { ArticleView } from '../components/cantera/ArticleView';
 import { fundamentosArticles } from '../core/data/fundamentosData';
+import { seleccionArticles } from '../core/data/seleccionData';
 import { Article } from '../core/types/article';
 
 interface HomePageProps {
@@ -39,7 +40,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full">
         {/* Sidebar */}
         <ArticleSidebar
-          articles={fundamentosArticles}
+          articles={[...fundamentosArticles, ...seleccionArticles]}
           activeArticle={activeArticle}
           onSelect={setActiveArticle}
         />
@@ -55,7 +56,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             <>
               <Section title="1. Formato General de un Algoritmo" icon={BookOpen}>
                 <p className="mb-4">Todo algoritmo debe seguir una estructura base para asegurar claridad y orden en su ejecución.</p>
-                <CodeBlock code={`Algoritmo Nombre_Del_Problema\n   Declaración \n  Constantes:\n    Nombre_Constante = Valor\n  Tipos:\n    Nombre_Tipo = Tipo de dato\n  Variables:\n    Nombre_Variable: Tipo de dato (o Nombre_Tipo)\n\nInicio\n  // Aquí van las acciones que conforman el algoritmo\nFin`} />
+                <CodeBlock code={`Algoritmo Nombre_Del_Problema\n\nDeclaración \n  Constantes:\n    NOMBRE_CONSTANTE = Valor\n  Tipos:\n    Nombre_Tipo = Definición\n  Variables:\n    Nombre_Variable: Tipo_Dato\n\nInicio\n  // Acciones del algoritmo\nFin`} />
               </Section>
 
               <Section title="2. Acciones Básicas" icon={Terminal}>
@@ -73,7 +74,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-colors">
                     <h3 className="text-lg font-bold text-brand-300 mb-2">Escritura</h3>
                     <p className="text-sm text-slate-400 mb-3">Muestra salida con texto y variables.</p>
-                    <CodeBlock code={`Escribir 'Texto', Var`} />
+                    <CodeBlock code={`Escribir "Texto", Var`} />
                   </div>
                 </div>
                 <div className="mt-6 flex justify-end">
@@ -91,16 +92,30 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <div className="space-y-8">
                   <div>
                     <h3 className="text-xl font-semibold text-brand-200 mb-3">Selección Simple y Doble</h3>
-                    <CodeBlock code={`Si Expresión Condicional Entonces\n  // Acciones si verdadero\nSino\n  // Acciones alternativas (Opcional)\nFin Si`} />
-                    <div className="mt-4">
+                    <CodeBlock code={`Si Condición Entonces\n  // Acciones si verdadero\nSino\n  // Acciones alternativas (Opcional)\nFin Si`} />
+                    <div className="mt-4 flex flex-wrap gap-4">
                       <Button variant="secondary" onClick={() => onNavigate('flow_demo')} icon={Terminal}>
                         Laboratorio Interactivo de Flujo (Demo)
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        icon={BookOpen} 
+                        onClick={() => setActiveArticle(seleccionArticles[0])}
+                      >
+                        Introducción a la Selección
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        icon={ChevronRight} 
+                        onClick={() => setActiveArticle(seleccionArticles[1])}
+                      >
+                        Artículo: Selección Simple (Si)
                       </Button>
                     </div>
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-brand-200 mb-3">Selección Múltiple</h3>
-                    <CodeBlock code={`Caso Nombre_Variable\n  Valor1: Acciones 1\n  Valor2: Acciones 2\n  Sino: // Acciones por defecto (Opcional)\nFin Caso`} />
+                    <CodeBlock code={`Caso Nombre_Variable\n  Valor1: Acciones 1\n  Valor2: Acciones 2\n  Sino: // Por defecto (Opcional)\nFin Caso`} />
                   </div>
                 </div>
               </Section>
@@ -110,7 +125,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <div>
                     <p className="font-semibold text-brand-300 mb-2">Repetir / Hasta</p>
                     <p className="text-sm text-slate-400 mb-2">Ejecuta al menos una vez hasta cumplir condición.</p>
-                    <CodeBlock code={`Repetir\n  // Acciones\nHasta Expresión Condicional`} />
+                    <CodeBlock code={`Repetir\n  // Acciones\nHasta Condición`} />
                   </div>
                   <div>
                     <p className="font-semibold text-brand-300 mb-2">Mientras</p>
@@ -138,11 +153,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <h3 className="text-lg font-bold text-brand-200 mb-2">Procedimientos</h3>
-                      <CodeBlock code={`Procedimiento Nombre [(Parametros)]\n  // Declaraciones\nInicio\n  // Acciones\nFin Procedimiento\n\n// Invocación:\nLlamar Nombre [(Valores)]`} />
+                      <CodeBlock code={`Procedimiento Nombre (↓ Tipo: p1, ↑ Tipo: p2)\n  // Declaraciones Locales\nInicio\n  // Acciones\nFin Procedimiento\n\n// Invocación:\nLlamar Nombre (val1, var2)`} />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-brand-200 mb-2">Funciones</h3>
-                      <CodeBlock code={`Función Nombre (...): Tipo\n  // Declaraciones\nInicio\n  // Acciones que retornan valor\nFin Función\n\n// Invocación (en expresión):\nX <- Nombre(...)`} />
+                      <CodeBlock code={`Función Nombre (↓ Tipo: p1): TipoRetorno\n  // Declaraciones Locales\nInicio\n  // Acciones que retornan valor\nFin Función\n\n// Invocación (en expresión):\nX <- Nombre (val1)`} />
                     </div>
                   </div>
                 </div>
@@ -167,11 +182,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <div className="grid md:grid-cols-2 gap-8">
                     <div>
                       <h3 className="text-xl font-semibold text-brand-200 mb-3">Registros</h3>
-                      <CodeBlock code={`Registro de\n  Campo1: Tipo\n  Campo2: Tipo\nFin Registro\n\n// Acceso:\nVariable.Campo1`} />
+                      <CodeBlock code={`Registro de\n  Tipo: Campo1\n  Tipo: Campo2\nFin Registro\n\n// Acceso:\nVariable.Campo1`} />
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-brand-200 mb-3">Archivos</h3>
-                      <p className="text-sm text-slate-400 mb-2">Se declaran como: <code className="text-brand-200 font-mono">Archivo de Tipo Registro</code></p>
+                      <p className="text-sm text-slate-400 mb-2">Se declaran como: <code className="text-brand-200 font-mono">Archivo de Tipo NombreRegistro</code></p>
                       <div className="flex flex-wrap gap-2 text-[10px] font-mono">
                         {['Conectar', 'Abrir', 'Crear', 'Leer', 'Grabar', 'Cerrar', 'Eliminar', 'Renombrar'].map(op => (
                           <span key={op} className="px-2 py-1 bg-slate-800 border border-slate-700/50 rounded text-brand-100 uppercase">{op}</span>
