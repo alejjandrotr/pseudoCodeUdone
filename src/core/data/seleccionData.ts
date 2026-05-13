@@ -7,6 +7,7 @@ import { ArticleVideoSeleccionDoble } from '../../components/cantera/articles/Ar
 import { ArticleVideoAnidacion } from '../../components/cantera/articles/ArticleVideoAnidacion';
 import { ArticleSeleccionMultiple } from '../../components/cantera/articles/ArticleSeleccionMultiple';
 import { ArticleVideoSeleccionMultiple } from '../../components/cantera/articles/ArticleVideoSeleccionMultiple';
+import { ArticleEjerciciosSeleccion } from '../../components/cantera/articles/ArticleEjerciciosSeleccion';
 
 export const seleccionArticles: Article[] = [
   {
@@ -80,5 +81,14 @@ export const seleccionArticles: Article[] = [
     summary: 'Video sobre el funcionamiento de la estructura Caso y el ejercicio de los días de la semana.',
     component: ArticleVideoSeleccionMultiple,
     type: 'video',
+  },
+  {
+    id: 'seleccion-05',
+    slug: '05-ejercicios-practicos',
+    title: 'Ejercicios de Selección',
+    category: 'Estructuras de Selección',
+    summary: 'Colección de 10 ejercicios prácticos para aplicar estructuras de decisión simples, dobles y múltiples.',
+    component: ArticleEjerciciosSeleccion,
+    type: 'lesson',
   }
 ];

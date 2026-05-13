@@ -10,6 +10,8 @@ import { useSelectedProfessor } from "../../core/hooks/useSelectedProfessor";
 
 interface ExerciseItemProps extends Exercise {
   openSettings: () => void;
+  solutionsLocked?: boolean;
+  blockedProfessorIds?: string[];
 }
 
 export const ExerciseItem: React.FC<ExerciseItemProps> = ({
@@ -19,9 +21,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   c,
   typescript,
   openSettings,
+  solutionsLocked = false,
+  blockedProfessorIds = [],
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"sandbox" | "pseudocodigo" | "c" | "typescript">("sandbox");
+
+  const availableProfessors = professorsData.filter(p => !blockedProfessorIds.includes(p.id));
 
   // Sandbox State
   const [userCode, setUserCode] = useState("");
@@ -145,7 +151,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                           onChange={(e) => setSelectedProfId(e.target.value)}
                           className="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-1.5 outline-none focus:border-brand-500 transition-colors max-w-[180px] truncate hover:bg-slate-800"
                         >
-                          {professorsData.map((prof) => (
+                          {availableProfessors.map((prof) => (
                             <option key={prof.id} value={prof.id}>
                               {prof.name}
                             </option>
@@ -166,10 +172,18 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   />
                 </div>
 
+                {blockedProfessorIds.includes(selectedProfId) && (
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-xs flex items-center gap-2">
+                    <Sparkles size={16} />
+                    <span>{selectedProfessor.name} no está disponible para este ejercicio avanzado. Por favor, selecciona un mentor de mayor nivel (50% ayuda o menos).</span>
+                  </div>
+                )}
+
                 <div className="flex justify-end">
                   <Button
                     onClick={handleEvaluate}
                     isLoading={isEvaluating}
+                    disabled={blockedProfessorIds.includes(selectedProfId)}
                     icon={Sparkles}
                     className="min-w-[180px]"
                   >
@@ -199,26 +213,49 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
             {activeTab !== "sandbox" && (
               <div className="animate-fade-in">
-                <div className="flex border-b border-slate-800/50 mb-4 pb-2">
-                  <LanguageTab
-                    label="Pseudocódigo"
-                    active={activeTab === "pseudocodigo"}
-                    onClick={() => setActiveTab("pseudocodigo")}
-                  />
-                  <LanguageTab
-                    label="Lenguaje C"
-                    active={activeTab === "c"}
-                    onClick={() => setActiveTab("c")}
-                  />
-                  <LanguageTab
-                    label="TypeScript"
-                    active={activeTab === "typescript"}
-                    onClick={() => setActiveTab("typescript")}
-                  />
-                </div>
-                {activeTab === "pseudocodigo" && <CodeBlock code={pseudocodigo} />}
-                {activeTab === "c" && <CodeBlock code={c} />}
-                {activeTab === "typescript" && <CodeBlock code={typescript} />}
+                {solutionsLocked ? (
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-8 text-center space-y-4">
+                    <div className="bg-amber-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto text-amber-400">
+                      <Code2 size={32} />
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-xl font-bold text-amber-200">Solución bloqueada</h4>
+                      <p className="text-amber-200/60 max-w-md mx-auto">
+                        Las soluciones oficiales para este reto estarán disponibles a partir del próximo lunes. ¡Intenta resolverlo por tu cuenta primero!
+                      </p>
+                    </div>
+                    <Button 
+                      variant="secondary" 
+                      onClick={() => setActiveTab("sandbox")}
+                      className="mt-4"
+                    >
+                      Volver al Editor
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex border-b border-slate-800/50 mb-4 pb-2">
+                      <LanguageTab
+                        label="Pseudocódigo"
+                        active={activeTab === "pseudocodigo"}
+                        onClick={() => setActiveTab("pseudocodigo")}
+                      />
+                      <LanguageTab
+                        label="Lenguaje C"
+                        active={activeTab === "c"}
+                        onClick={() => setActiveTab("c")}
+                      />
+                      <LanguageTab
+                        label="TypeScript"
+                        active={activeTab === "typescript"}
+                        onClick={() => setActiveTab("typescript")}
+                      />
+                    </div>
+                    {activeTab === "pseudocodigo" && <CodeBlock code={pseudocodigo} />}
+                    {activeTab === "c" && <CodeBlock code={c} />}
+                    {activeTab === "typescript" && <CodeBlock code={typescript} />}
+                  </>
+                )}
               </div>
             )}
           </div>
