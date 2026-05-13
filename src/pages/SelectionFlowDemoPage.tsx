@@ -100,7 +100,7 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
         } else {
           setIsPlaying(false);
         }
-      }, 1500); // 1.5s delay between steps for visual tracking
+      }, 1500);
     }
     
     return () => clearTimeout(timer);
@@ -121,7 +121,6 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
       return target;
     }
     
-    // Default: find the next edge
     const nextEdge = FLOW_EDGES.find(e => e.from === currentId);
     if (nextEdge) {
       const edge = { from: currentId, to: nextEdge.to };
@@ -217,8 +216,30 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Visual Flow (Now Left) */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden order-1">
+          {/* Code View (Now Top on mobile) */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-0 flex flex-col overflow-hidden min-h-[400px] order-1">
+            <div className="bg-slate-800/80 px-4 py-3 flex items-center justify-between border-b border-slate-700">
+              <span className="text-sm font-mono text-slate-400">pseudocodigo.udone</span>
+            </div>
+            <div className="p-4 font-mono text-[13px] text-slate-300 overflow-y-auto flex-1">
+              {CODE_LINES.map((line, idx) => {
+                const lineNumber = idx + 1;
+                const isActive = activeNodeId && EXECUTION_PLAN[activeNodeId]?.line === lineNumber;
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex gap-4 px-2 py-1 transition-colors rounded-sm ${isActive ? 'bg-brand-500/20 text-white border-l-2 border-brand-400' : 'border-l-2 border-transparent text-slate-400'}`}
+                  >
+                    <span className="text-slate-600 select-none w-4 text-right flex-shrink-0">{lineNumber}</span>
+                    <span className="whitespace-pre">{line}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Visual Flow (Now Bottom on mobile) */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden order-2">
             
             {/* Diagram Component */}
             <div className="w-full h-full relative z-10 flex justify-center mt-[-30px]">
@@ -252,28 +273,6 @@ export const SelectionFlowDemoPage: React.FC<SelectionFlowDemoPageProps> = ({ on
                  <Play size={16} className={isPlaying ? 'hidden' : 'block'} />
                  {isPlaying ? 'Pausar' : 'Iniciar Flujo'}
                </button>
-            </div>
-          </div>
-
-          {/* Code View (Now Middle) */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-0 flex flex-col overflow-hidden min-h-[400px] order-2">
-            <div className="bg-slate-800/80 px-4 py-3 flex items-center justify-between border-b border-slate-700">
-              <span className="text-sm font-mono text-slate-400">pseudocodigo.udone</span>
-            </div>
-            <div className="p-4 font-mono text-[13px] text-slate-300 overflow-y-auto flex-1">
-              {CODE_LINES.map((line, idx) => {
-                const lineNumber = idx + 1;
-                const isActive = activeNodeId && EXECUTION_PLAN[activeNodeId]?.line === lineNumber;
-                return (
-                  <div 
-                    key={idx} 
-                    className={`flex gap-4 px-2 py-1 transition-colors rounded-sm ${isActive ? 'bg-brand-500/20 text-white border-l-2 border-brand-400' : 'border-l-2 border-transparent text-slate-400'}`}
-                  >
-                    <span className="text-slate-600 select-none w-4 text-right flex-shrink-0">{lineNumber}</span>
-                    <span className="whitespace-pre">{line}</span>
-                  </div>
-                )
-              })}
             </div>
           </div>
 

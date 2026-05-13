@@ -167,10 +167,38 @@ export const InteractiveFlowExercise: React.FC<InteractiveFlowExerciseProps> = (
       
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-0">
         
-        {/* Left Side: Diagram + Code */}
+        {/* Left Side: Code + Diagram */}
         <div className="flex flex-col border-r border-slate-700/50">
-          {/* Top Half: Flow Diagram */}
-          <div className="relative min-h-[350px] p-4 flex justify-center border-b border-slate-700/50 custom-scrollbar overflow-auto bg-slate-900/50">
+          {/* Top Half: Code */}
+          <div className="flex-1 bg-slate-900 min-h-[250px] flex flex-col border-b border-slate-700/50">
+            <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700">
+              <span className="text-xs font-mono text-slate-400">pseudocodigo.udone</span>
+            </div>
+            <div className="p-4 font-mono text-[13px] text-slate-300 overflow-y-auto flex-1 custom-scrollbar">
+              {code.map((line, idx) => {
+                const lineNumber = idx + 1;
+                const isActive = activeNodeId && plan[activeNodeId]?.line === lineNumber;
+                const isHighlighted = highlightedNodeId && plan[highlightedNodeId]?.line === lineNumber;
+                
+                let rowClasses = 'border-l-2 border-transparent text-slate-400';
+                if (isActive) {
+                  rowClasses = 'bg-brand-500/20 text-white border-l-2 border-brand-400';
+                } else if (isHighlighted) {
+                  rowClasses = 'bg-violet-500/20 text-white border-l-2 border-violet-400';
+                }
+
+                return (
+                  <div key={idx} className={`flex gap-4 px-2 py-0.5 transition-colors rounded-sm ${rowClasses}`}>
+                    <span className="text-slate-600 select-none w-4 text-right flex-shrink-0">{lineNumber}</span>
+                    <span className="whitespace-pre">{line}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Bottom Half: Flow Diagram */}
+          <div className="relative min-h-[350px] p-4 flex justify-center custom-scrollbar overflow-auto bg-slate-900/50">
             <FlowDiagram 
               nodes={nodes} 
               edges={edges} 
@@ -201,34 +229,6 @@ export const InteractiveFlowExercise: React.FC<InteractiveFlowExerciseProps> = (
                  <Play size={14} className={isPlaying ? 'hidden' : 'block'} />
                  {isPlaying ? 'Pausar' : 'Ejecutar'}
                </button>
-            </div>
-          </div>
-
-          {/* Bottom Half: Code */}
-          <div className="flex-1 bg-slate-900 min-h-[250px] flex flex-col">
-            <div className="bg-slate-800/80 px-4 py-2 border-b border-slate-700">
-              <span className="text-xs font-mono text-slate-400">pseudocodigo.udone</span>
-            </div>
-            <div className="p-4 font-mono text-[13px] text-slate-300 overflow-y-auto flex-1 custom-scrollbar">
-              {code.map((line, idx) => {
-                const lineNumber = idx + 1;
-                const isActive = activeNodeId && plan[activeNodeId]?.line === lineNumber;
-                const isHighlighted = highlightedNodeId && plan[highlightedNodeId]?.line === lineNumber;
-                
-                let rowClasses = 'border-l-2 border-transparent text-slate-400';
-                if (isActive) {
-                  rowClasses = 'bg-brand-500/20 text-white border-l-2 border-brand-400';
-                } else if (isHighlighted) {
-                  rowClasses = 'bg-violet-500/20 text-white border-l-2 border-violet-400';
-                }
-
-                return (
-                  <div key={idx} className={`flex gap-4 px-2 py-0.5 transition-colors rounded-sm ${rowClasses}`}>
-                    <span className="text-slate-600 select-none w-4 text-right flex-shrink-0">{lineNumber}</span>
-                    <span className="whitespace-pre">{line}</span>
-                  </div>
-                )
-              })}
             </div>
           </div>
         </div>
