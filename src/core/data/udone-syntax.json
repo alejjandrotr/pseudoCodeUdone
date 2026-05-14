@@ -142,11 +142,11 @@
   },
   "seleccion_simple_doble": {
     "formato": "Si <Expresión Condicional> Entonces\n  ...\nSino\n  ...\nFin Si",
-    "nota": "La rama 'Sino' es opcional. 'Fin Si' siempre cierra el bloque. Se puede anidar. FLEXIBILIDAD: El uso de dos puntos (:) después de 'Entonces' o 'Sino' es opcional y no se considera error de sintaxis."
+    "nota": "La rama 'Sino' es opcional. 'Fin Si' siempre cierra el bloque. Se puede anidar. FLEXIBILIDAD: Tanto las palabras reservadas como sus cierres (Fin Si, Fin si, FIN SI) son INSENSIBLES a mayúsculas/minúsculas. El uso de dos puntos (:) después de 'Entonces' o 'Sino' es opcional."
   },
   "seleccion_multiple": {
     "formato": "Caso <Variable>\n  Valor1: Acción1\n  Valor2: Acción2\n  Sino: AcciónPorDefecto\nFin Caso",
-    "nota": "El 'Sino' en Caso es opcional. Usar para valores discretos, no para rangos. No lleva 'Entonces'."
+    "nota": "El 'Sino' en Caso es opcional. Usar para valores discretos, no para rangos. No lleva 'Entonces'. FLEXIBILIDAD: 'Fin Caso' es insensible a mayúsculas/minúsculas."
   },
   "ciclo_repetir": {
     "formato": "Repetir\n  ...\nHasta <Expresión Condicional>",
@@ -154,12 +154,12 @@
   },
   "ciclo_mientras": {
     "formato": "Mientras <Expresión Condicional> Hacer\n  ...\nFin Mientras",
-    "nota": "La condición se evalúa AL INICIO. Si es Falsa desde el principio, el cuerpo NO se ejecuta."
+    "nota": "La condición se evalúa AL INICIO. Si es Falsa desde el principio, el cuerpo NO se ejecuta. FLEXIBILIDAD: 'Fin Mientras' es insensible a mayúsculas/minúsculas."
   },
   "ciclo_para": {
     "formato": "Para <Variable> <- Vi Hasta Vf [Inc | Dec valor]\n  ...\nFin Para",
     "ejemplo": "Para i <- 1 Hasta 10\n  ...\nFin Para",
-    "nota": "El incremento/decremento es OPCIONAL. Si se omite, se asume incremento de 1. La variable de control usa '<-'. NO usar '=' aquí."
+    "nota": "El incremento/decremento es OPCIONAL. Si se omite, se asume incremento de 1. La variable de control usa '<-'. NO usar '=' aquí. FLEXIBILIDAD: 'Fin Para' es insensible a mayúsculas/minúsculas."
   },
   "procedimientos": {
     "definicion_formato": "Procedimiento <Nombre> [(Parámetros)]\n  Declaración\nInicio\n  ...\nFin Procedimiento",
