@@ -15,14 +15,14 @@
       "  ...",
       "Fin"
     ],
-    "nota": "El nombre del algoritmo NO lleva paréntesis. La sección Declaración va ENTRE el nombre y el Inicio. 'Fin' sola cierra el bloque principal. Las secciones Constantes, Tipos y Variables son opcionales pero deben aparecer en ese orden si se usan."
+    "nota": "El nombre del algoritmo NO lleva paréntesis. La sección Declaración va ENTRE el nombre y el Inicio. 'Fin' sola cierra el bloque principal. Las secciones Constantes, Tipos y Variables son opcionales pero deben aparecer en ese orden si se usan. FLEXIBILIDAD: Las palabras reservadas (Inicio, Fin, Declaración, etc.) pueden o no llevar tildes y son INSENSIBLES a mayúsculas/minúsculas."
   },
   "entrada_salida": {
     "lectura_formato": "Leer <Variable>",
     "escritura_formato": "Escribir \"Texto\", <Variable>",
     "lectura_ejemplo": "Leer edad",
     "escritura_ejemplo": "Escribir \"El resultado es: \", resultado",
-    "nota": "Usar coma para concatenar en Escribir. NO usar + ni &. Para mostrar solo texto: Escribir \"Mensaje\"."
+    "nota": "Usar coma para concatenar en Escribir. NO usar + ni &. Para mostrar solo texto: Escribir \"Mensaje\". FLEXIBILIDAD: Las palabras 'Leer' y 'Escribir' pueden escribirse en mayúsculas, minúsculas o tipo oración indistintamente."
   },
   "asignacion": {
     "correcto": "<-",
@@ -43,7 +43,7 @@
   "declaracion_variables": {
     "formato": "<NombreVariable> [, <NombreVariable>...]: <TipoDato>",
     "ejemplo": "edad, cantidad: Entero",
-    "nota": "Se pueden declarar múltiples variables del mismo tipo separadas por coma ANTES de los dos puntos (ej: var1, var2: Entero). El nombre de la variable va primero, luego ':' y el tipo."
+    "nota": "Se pueden declarar múltiples variables del mismo tipo separadas por coma ANTES de los dos puntos (ej: var1, var2: Entero). El nombre de la variable va primero, luego ':' y el tipo. FLEXIBILIDAD: El uso de los dos puntos (:) después de la palabra 'Variables' es OPCIONAL (se puede escribir 'Variables:' o simplemente 'Variables')."
   },
   "tipos_de_dato": {
     "entero": {
@@ -78,7 +78,8 @@
         "False",
         "1",
         "0"
-      ]
+      ],
+      "nota": "FLEXIBILIDAD: Los nombres de los tipos de datos (Entero, Real, Lógico, etc.) pueden iniciar en mayúscula o minúscula indistintamente."
     }
   },
   "operadores_aritmeticos": {
@@ -141,7 +142,7 @@
   },
   "seleccion_simple_doble": {
     "formato": "Si <Expresión Condicional> Entonces\n  ...\nSino\n  ...\nFin Si",
-    "nota": "La rama 'Sino' es opcional. 'Fin Si' siempre cierra el bloque. Se puede anidar."
+    "nota": "La rama 'Sino' es opcional. 'Fin Si' siempre cierra el bloque. Se puede anidar. FLEXIBILIDAD: El uso de dos puntos (:) después de 'Entonces' o 'Sino' es opcional y no se considera error de sintaxis."
   },
   "seleccion_multiple": {
     "formato": "Caso <Variable>\n  Valor1: Acción1\n  Valor2: Acción2\n  Sino: AcciónPorDefecto\nFin Caso",

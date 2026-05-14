@@ -126,7 +126,8 @@ Nota: ${s.nomenclatura_identificadores.nota}
 
 ════════════════════════════════════════════════
 INSTRUCCIÓN DE EVALUACIÓN:
-Analiza el pseudocódigo del estudiante. Si viola alguna de estas reglas o usa sintaxis de otros lenguajes (llaves {}, palabras reservadas como print, def, function, var, let, if/else sin Entonces, etc.), márcalo como error y explica la corrección basándote en este estándar.
+1. Analiza el pseudocódigo del estudiante. Si viola alguna de estas reglas o usa sintaxis de otros lenguajes (llaves {}, palabras reservadas como print, def, function, var, let, if/else sin Entonces, etc.), márcalo como error y explica la corrección basándote en este estándar.
+2. CRITERIO DE FLEXIBILIDAD: NO penalices ni marques como error diferencias en el uso de tildes (ej: 'Declaración' vs 'Declaracion'), ni diferencias de mayúsculas/minúsculas en palabras reservadas o tipos de datos (ej: 'Leer' vs 'leer', 'Entero' vs 'entero'). Tampoco penalices el uso opcional de dos puntos (:) después de 'Variables', 'Entonces' o 'Sino'. Estos casos deben considerarse CORRECTOS.
 ════════════════════════════════════════════════
 `;
 
@@ -148,7 +149,7 @@ export async function getOrCreateUdoneCache(
   apiKey: string,
   modelName: string
 ): Promise<string | null> {
-  const storeKey = `${apiKey}:${modelName}:v2`;
+  const storeKey = `${apiKey}:${modelName}:v3`;
   const existing = cacheStore.get(storeKey);
 
   // Cache hit — still valid
