@@ -7,6 +7,8 @@ import { CodeBlock, Console } from "../common/DisplayComponents";
 import { Button } from "../common/Button";
 import { professorsData } from "../../core/data/professorsData";
 import { useSelectedProfessor } from "../../core/hooks/useSelectedProfessor";
+import { analyticsService, ExerciseStat } from "../../core/services/analyticsService";
+import { BarChart3 } from "lucide-react";
 
 interface ExerciseItemProps extends Exercise {
   openSettings: () => void;
@@ -36,6 +38,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
   const [consoleOutput, setConsoleOutput] = useState("");
   const [usage, setUsage] = useState<{ promptTokens: number; completionTokens: number; totalTokens: number; cachedTokens?: number } | undefined>(undefined);
   const [wasCached, setWasCached] = useState(false);
+  const [stats, setStats] = useState<ExerciseStat | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen && !stats) {
+      analyticsService.getExerciseStats(numero).then(setStats).catch(console.error);
+    }
+  }, [isOpen, numero, stats]);
 
   const selectedProfessor = professorsData.find(p => p.id === selectedProfId) || professorsData[0];
 
@@ -70,6 +79,19 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
       setConsoleOutput(response.text);
       setUsage(response.usage);
       setWasCached(response.cached);
+
+      // Rastreo Anónimo de Resultados
+      const isApproved = response.text.includes("VEREDICTO FINAL: APROBADO");
+      const isRejected = response.text.includes("VEREDICTO FINAL: RECHAZADO");
+      if (isApproved) {
+        await analyticsService.trackExerciseResult(numero, 'APROBADO');
+      } else if (isRejected) {
+        await analyticsService.trackExerciseResult(numero, 'RECHAZADO');
+      }
+      
+      // Actualizar stats locales para la UI
+      analyticsService.getExerciseStats(numero).then(setStats).catch(console.error);
+
     } catch (error: any) {
       if (error.message === "API_KEY_INVALID" || error.message === "API_KEY_MISSING") {
         setConsoleOutput("ERROR CRÍTICO: La API Key guardada no es válida o expiró. Abre la configuración.");
@@ -179,7 +201,13 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
                   </div>
                 )}
 
-                <div className="flex justify-end">
+                <div className="flex justify-between items-center mt-2">
+                  {stats ? (
+                    <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/50 px-3 py-1.5 rounded border border-slate-800 animate-fade-in">
+                      <BarChart3 size={14} className="text-brand-400" />
+                      <span>Comunidad: <strong className="text-emerald-400">{stats.successCount} aciertos</strong> | <strong className="text-rose-400">{stats.failCount} fallos</strong></span>
+                    </div>
+                  ) : <div />}
                   <Button
                     onClick={handleEvaluate}
                     isLoading={isEvaluating}

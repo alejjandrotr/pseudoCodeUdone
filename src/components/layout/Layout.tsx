@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LucideIcon, ChevronRight, ChevronDown, Users, UploadCloud } from 'lucide-react';
+import { LucideIcon, ChevronRight, ChevronDown, Users, UploadCloud, ShieldCheck } from 'lucide-react';
 import { Button } from '../common/Button';
 
 interface SectionProps {
@@ -89,8 +89,27 @@ export const Header: React.FC<{
 );
 
 export const Footer: React.FC = () => (
-  <footer className="text-center py-8 text-slate-600 border-t border-slate-800/50 relative z-10 w-full mt-auto">
-    <p>Universidad de Oriente • {new Date().getFullYear()}</p>
-    <p className="text-sm mt-1">Generado automáticamente para propósitos educativos.</p>
+  <footer className="py-12 relative z-10 w-full mt-auto border-t border-slate-800/50">
+    <div className="max-w-4xl mx-auto px-6 text-center">
+      <div className="mb-8 p-4 md:p-6 bg-slate-900/60 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-left shadow-lg">
+        <div className="p-3 bg-brand-500/10 rounded-full text-brand-400 flex-shrink-0">
+          <ShieldCheck size={28} />
+        </div>
+        <div>
+          <h4 className="text-slate-200 font-bold mb-1 flex items-center gap-2">
+            Privacidad y Transparencia
+          </h4>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Esta plataforma <strong>no utiliza cookies</strong> de rastreo ni recopila datos personales (como tu IP, ubicación o nombre). 
+            Únicamente registramos estadísticas globales y completamente anónimas de visitas e intentos de ejercicios (aciertos/fallos) 
+            con fines puramente académicos para mejorar la herramienta.
+          </p>
+        </div>
+      </div>
+      <div className="text-slate-600">
+        <p className="font-semibold">Universidad de Oriente • {new Date().getFullYear()}</p>
+        <p className="text-sm mt-1">Generado para propósitos educativos.</p>
+      </div>
+    </div>
   </footer>
 );

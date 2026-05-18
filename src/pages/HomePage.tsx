@@ -9,7 +9,10 @@ import {
   ChevronRight,
   FileText,
   Users,
-  UploadCloud
+  UploadCloud,
+  Activity,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import { Section, Header, Footer } from '../components/layout/Layout';
 import { CodeBlock } from '../components/common/DisplayComponents';
@@ -19,13 +22,19 @@ import { ArticleView } from '../components/cantera/ArticleView';
 import { fundamentosArticles } from '../core/data/fundamentosData';
 import { seleccionArticles } from '../core/data/seleccionData';
 import { Article } from '../core/types/article';
+import { analyticsService, GlobalStats } from '../core/services/analyticsService';
 
 interface HomePageProps {
-  onNavigate: (view: 'acciones_basicas' | 'ejercicios_secuenciacion' | 'professors' | 'custom_exercise' | 'flow_demo') => void;
+  onNavigate: (view: 'acciones_basicas' | 'ejercicios_secuenciacion' | 'professors' | 'custom_exercise' | 'flow_demo' | 'loop_flow_demo') => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [activeArticle, setActiveArticle] = useState<Article | null>(null);
+  const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
+
+  React.useEffect(() => {
+    analyticsService.getGlobalStats().then(setGlobalStats).catch(console.error);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black relative flex flex-col overflow-x-hidden">
@@ -54,6 +63,32 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             />
           ) : (
             <>
+              {/* Community Stats Widget */}
+              {globalStats && (
+                <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4 animate-slide-up">
+                  <div className="glass-panel p-4 flex flex-col items-center justify-center text-center">
+                    <Activity className="text-brand-400 mb-2" size={24} />
+                    <span className="text-2xl font-bold text-slate-100">{globalStats.totalPageViews}</span>
+                    <span className="text-xs text-slate-400 uppercase tracking-wider">Visitas a la Guía</span>
+                  </div>
+                  <div className="glass-panel p-4 flex flex-col items-center justify-center text-center">
+                    <CheckCircle className="text-emerald-400 mb-2" size={24} />
+                    <span className="text-2xl font-bold text-slate-100">{globalStats.totalExercisesSolved}</span>
+                    <span className="text-xs text-slate-400 uppercase tracking-wider">Ejercicios Resueltos</span>
+                  </div>
+                  <div className="glass-panel p-4 flex flex-col items-center justify-center text-center">
+                    <XCircle className="text-rose-400 mb-2" size={24} />
+                    <span className="text-2xl font-bold text-slate-100">{globalStats.totalExercisesFailed}</span>
+                    <span className="text-xs text-slate-400 uppercase tracking-wider">Intentos Fallidos</span>
+                  </div>
+                  <div className="glass-panel p-4 flex flex-col items-center justify-center text-center">
+                    <Users className="text-amber-400 mb-2" size={24} />
+                    <span className="text-2xl font-bold text-slate-100">{globalStats.successRate}%</span>
+                    <span className="text-xs text-slate-400 uppercase tracking-wider">Tasa de Éxito Global</span>
+                  </div>
+                </div>
+              )}
+
               <Section title="1. Formato General de un Algoritmo" icon={BookOpen}>
                 <p className="mb-4">Todo algoritmo debe seguir una estructura base para asegurar claridad y orden en su ejecución.</p>
                 <CodeBlock code={`Algoritmo Nombre_Del_Problema\n\nDeclaración \n  Constantes:\n    NOMBRE_CONSTANTE = Valor\n  Tipos:\n    Nombre_Tipo = Definición\n  Variables:\n    Nombre_Variable: Tipo_Dato\n\nInicio\n  // Acciones del algoritmo\nFin`} />
@@ -136,6 +171,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     <p className="font-semibold text-brand-300 mb-2">Para</p>
                     <p className="text-sm text-slate-400 mb-2">Iteración con contador conocido. El incremento por defecto es 1 si se omite.</p>
                     <CodeBlock code={`Para Variable <- Vi Hasta Vf [Inc | Dec valor]\n  // Acciones\nFin Para`} />
+                    <div className="mt-4 flex flex-wrap gap-4">
+                      <Button variant="secondary" onClick={() => onNavigate('loop_flow_demo')} icon={Repeat}>
+                        Laboratorio Interactivo de Ciclos (Demo)
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Section>
