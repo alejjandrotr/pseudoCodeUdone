@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Google Apps Script - Telemetría Anónima
  * 
