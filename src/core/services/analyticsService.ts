@@ -101,11 +101,199 @@ class LocalStorageAnalyticsProvider implements IAnalyticsProvider {
   }
 }
 
+/**
+ * Implementación de Producción usando Google Sheets + Google Apps Script (100% Gratis y Compartido)
+ * Todos los usuarios sumarán sus visitas y aciertos en tiempo real.
+ */
+class GoogleSheetsAnalyticsProvider implements IAnalyticsProvider {
+  private apiUrl = import.meta.env.VITE_ANALYTICS_API_URL || '';
+  private cache: { pageViews: Record<string, number>; exercises: Record<number, { successCount: number; failCount: number }> } | null = null;
+  private cachePromise: Promise<any> | null = null;
+
+  constructor() {
+    if (!this.apiUrl) {
+      console.warn(
+        "⚠️ [Analytics] VITE_ANALYTICS_API_URL no está definida. Se usará LocalStorage como fallback temporal."
+      );
+    }
+  }
+
+  private async fetchAllData(): Promise<any> {
+    if (!this.apiUrl) return { pageViews: {}, exercises: {} };
+    if (this.cache) return this.cache;
+    if (this.cachePromise) return this.cachePromise;
+
+    this.cachePromise = fetch(this.apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        this.cache = {
+          pageViews: data.pageViews || {},
+          exercises: data.exercises || {}
+        };
+        this.cachePromise = null;
+        return this.cache;
+      })
+      .catch(err => {
+        console.error("❌ Error al obtener estadísticas globales:", err);
+        this.cachePromise = null;
+        return { pageViews: {}, exercises: {} };
+      });
+
+    return this.cachePromise;
+  }
+
+  async trackPageView(pageName: string): Promise<void> {
+    if (!this.apiUrl) {
+      // Fallback
+      return new LocalStorageAnalyticsProvider().trackPageView(pageName);
+    }
+    // Usar sendBeacon o fetch asíncrono en segundo plano (no-cors para evitar problemas redirección de Google)
+    fetch(`${this.apiUrl}?action=trackPageView&pageName=${encodeURIComponent(pageName)}`, { mode: 'no-cors' })
+      .catch(err => console.error("Error al registrar visita:", err));
+  }
+
+  async trackExerciseResult(exerciseNumber: number, result: 'APROBADO' | 'RECHAZADO'): Promise<void> {
+    if (!this.apiUrl) {
+      // Fallback
+      return new LocalStorageAnalyticsProvider().trackExerciseResult(exerciseNumber, result);
+    }
+    fetch(`${this.apiUrl}?action=trackExerciseResult&exerciseNumber=${exerciseNumber}&result=${result}`, { mode: 'no-cors' })
+      .then(() => {
+        // Limpiar caché local para forzar recarga de estadísticas frescas
+        this.cache = null;
+      })
+      .catch(err => console.error("Error al registrar resultado:", err));
+  }
+
+  async getGlobalStats(): Promise<GlobalStats> {
+    if (!this.apiUrl) {
+      return new LocalStorageAnalyticsProvider().getGlobalStats();
+    }
+    const data = await this.fetchAllData();
+    
+    const totalPageViews = Object.values(data.pageViews).reduce((a: any, b: any) => a + b, 0) as number;
+    
+    let totalExercisesSolved = 0;
+    let totalExercisesFailed = 0;
+    
+    Object.values(data.exercises).forEach((ex: any) => {
+      totalExercisesSolved += ex.successCount || 0;
+      totalExercisesFailed += ex.failCount || 0;
+    });
+
+    const totalAttempts = totalExercisesSolved + totalExercisesFailed;
+    const successRate = totalAttempts > 0 ? Math.round((totalExercisesSolved / totalAttempts) * 100) : 0;
+
+    return {
+      totalPageViews,
+      totalExercisesSolved,
+      totalExercisesFailed,
+      successRate
+    };
+  }
+
+  async getExerciseStats(exerciseNumber: number): Promise<ExerciseStat | null> {
+    if (!this.apiUrl) {
+      return new LocalStorageAnalyticsProvider().getExerciseStats(exerciseNumber);
+    }
+    const data = await this.fetchAllData();
+    const exData = data.exercises[exerciseNumber];
+    
+    return {
+      exerciseNumber,
+      successCount: exData?.successCount || 0,
+      failCount: exData?.failCount || 0
+    };
+  }
+}
+
 // ============================================================================
-// ESTRATEGIA DE MIGRACIÓN: 
-// Cuando se desee migrar a Supabase, solo hay que crear una clase 
-// `SupabaseAnalyticsProvider implements IAnalyticsProvider` que haga llamadas 
-// fetch() al API REST de Supabase, y cambiar la instancia exportada aquí abajo.
+// CÓDIGO GOOGLE APPS SCRIPT PARA DEPLEGAR (Copia este código en tu Google Sheets):
+// ============================================================================
+//
+// function doGet(e) {
+//   var action = e.parameter.action;
+//   var sheet = SpreadsheetApp.getActiveSpreadsheet();
+//   
+//   // Asegurar que existan las hojas necesarias
+//   var pageViewsSheet = sheet.getSheetByName("PageViews") || sheet.insertSheet("PageViews");
+//   var exSheet = sheet.getSheetByName("ExerciseStats") || sheet.insertSheet("ExerciseStats");
+//   
+//   if (action === 'trackPageView') {
+//     var pageName = e.parameter.pageName;
+//     if (pageName) {
+//       incrementCounter(pageViewsSheet, pageName, 1);
+//     }
+//     return createJsonResponse({ success: true });
+//   }
+//   
+//   if (action === 'trackExerciseResult') {
+//     var exerciseNumber = e.parameter.exerciseNumber;
+//     var result = e.parameter.result;
+//     if (exerciseNumber && result) {
+//       var isSuccess = result === 'APROBADO';
+//       incrementExercise(exSheet, exerciseNumber, isSuccess);
+//     }
+//     return createJsonResponse({ success: true });
+//   }
+//   
+//   // Acción por defecto: Obtener estadísticas globales y agregadas
+//   var pageViews = {};
+//   var pageData = pageViewsSheet.getDataRange().getValues();
+//   for (var i = 0; i < pageData.length; i++) {
+//     if (pageData[i][0]) {
+//       pageViews[pageData[i][0]] = Number(pageData[i][1]) || 0;
+//     }
+//   }
+//   
+//   var exercises = {};
+//   var exData = exSheet.getDataRange().getValues();
+//   for (var j = 0; j < exData.length; j++) {
+//     if (exData[j][0]) {
+//       exercises[exData[j][0]] = {
+//         successCount: Number(exData[j][1]) || 0,
+//         failCount: Number(exData[j][2]) || 0
+//       };
+//     }
+//   }
+//   
+//   return createJsonResponse({ pageViews: pageViews, exercises: exercises });
+// }
+// 
+// function incrementCounter(sheet, key, amount) {
+//   var data = sheet.getDataRange().getValues();
+//   for (var i = 0; i < data.length; i++) {
+//     if (data[i][0] == key) {
+//       sheet.getRange(i + 1, 2).setValue((Number(data[i][1]) || 0) + amount);
+//       return;
+//     }
+//   }
+//   sheet.appendRow([key, amount]);
+// }
+// 
+// function incrementExercise(sheet, exerciseNumber, isSuccess) {
+//   var data = sheet.getDataRange().getValues();
+//   for (var i = 0; i < data.length; i++) {
+//     if (data[i][0] == exerciseNumber) {
+//       var col = isSuccess ? 2 : 3;
+//       var currentVal = Number(data[i][col - 1]) || 0;
+//       sheet.getRange(i + 1, col).setValue(currentVal + 1);
+//       return;
+//     }
+//   }
+//   if (isSuccess) {
+//     sheet.appendRow([exerciseNumber, 1, 0]);
+//   } else {
+//     sheet.appendRow([exerciseNumber, 0, 1]);
+//   }
+// }
+// 
+// function createJsonResponse(data) {
+//   return ContentService.createTextOutput(JSON.stringify(data))
+//     .setMimeType(ContentService.MimeType.JSON);
+// }
+//
 // ============================================================================
 
-export const analyticsService: IAnalyticsProvider = new LocalStorageAnalyticsProvider();
+// Instancia de servicio activa
+export const analyticsService: IAnalyticsProvider = new GoogleSheetsAnalyticsProvider();
