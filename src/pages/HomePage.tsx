@@ -21,6 +21,7 @@ import { ArticleSidebar } from '../components/cantera/ArticleSidebar';
 import { ArticleView } from '../components/cantera/ArticleView';
 import { fundamentosArticles } from '../core/data/fundamentosData';
 import { seleccionArticles } from '../core/data/seleccionData';
+import { ciclosArticles } from '../core/data/ciclosData';
 import { Article } from '../core/types/article';
 import { analyticsService, GlobalStats } from '../core/services/analyticsService';
 
@@ -49,7 +50,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full">
         {/* Sidebar */}
         <ArticleSidebar
-          articles={[...fundamentosArticles, ...seleccionArticles]}
+          articles={[...fundamentosArticles, ...seleccionArticles, ...ciclosArticles]}
           activeArticle={activeArticle}
           onSelect={setActiveArticle}
         />

@@ -8,6 +8,7 @@ import { ArticleVideoAnidacion } from '../../components/cantera/articles/Article
 import { ArticleSeleccionMultiple } from '../../components/cantera/articles/ArticleSeleccionMultiple';
 import { ArticleVideoSeleccionMultiple } from '../../components/cantera/articles/ArticleVideoSeleccionMultiple';
 import { ArticleEjerciciosSeleccion } from '../../components/cantera/articles/ArticleEjerciciosSeleccion';
+import { ArticleEjerciciosSeleccion2 } from '../../components/cantera/articles/ArticleEjerciciosSeleccion2';
 
 export const seleccionArticles: Article[] = [
   {
@@ -85,10 +86,19 @@ export const seleccionArticles: Article[] = [
   {
     id: 'seleccion-05',
     slug: '05-ejercicios-practicos',
-    title: 'Ejercicios de Selección',
+    title: 'Ejercicios de Selección · Sección 1',
     category: 'Estructuras de Selección',
     summary: 'Colección de 10 ejercicios prácticos para aplicar estructuras de decisión simples, dobles y múltiples.',
     component: ArticleEjerciciosSeleccion,
+    type: 'lesson',
+  },
+  {
+    id: 'seleccion-06',
+    slug: '06-ejercicios-practicos-2',
+    title: 'Ejercicios de Selección · Sección 2',
+    category: 'Estructuras de Selección',
+    summary: 'Segunda tanda de ejercicios (11–21): corridas en frío, puntos adicionales, consecutivos, mínimo de tres, ordenación, series, par/impar, rangos, productos almacén, días de la semana y verificación de carácter.',
+    component: ArticleEjerciciosSeleccion2,
     type: 'lesson',
   }
 ];
