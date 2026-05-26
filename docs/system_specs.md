@@ -20,7 +20,7 @@ El sistema se estructura en un modelo Single Page Application (SPA), compuesto p
 - **Sandbox (Ejercicios View):** Zona interactiva donde el estudiante resuelve problemas usando notación UDONE, con asistencia de IA y feedback de compilación simulada.
 
 ## 4. Integraciones Externas
-- **Servicio IA:** Google Generative AI (Modelo `gemini-3.1-flash-lite-preview`). 
+- **Servicio IA:** Google Generative AI (Modelo `gemini-2.5-flash`). 
   - Las llamadas se realizan directamente desde el cliente (Frontend).
   - La Autenticación (API Key) está delegada al cliente, quien debe suministrar su propio Token y se persistirá en `localStorage`.
 

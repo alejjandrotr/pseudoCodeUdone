@@ -36,12 +36,12 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [apiKey, setApiKey] = useState("");
-  const [modelName, setModelName] = useState("gemini-3.1-flash-lite-preview");
+  const [modelName, setModelName] = useState("gemini-2.5-flash");
 
   useEffect(() => {
     if (isOpen) {
       setApiKey(localStorage.getItem("gemini_api_key") || "");
-      setModelName(localStorage.getItem("gemini_model") || "gemini-3.1-flash-lite-preview");
+      setModelName(localStorage.getItem("gemini_model") || "gemini-2.5-flash");
     }
   }, [isOpen]);
 
@@ -68,11 +68,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             onChange={(e) => setModelName(e.target.value)}
             className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all mb-4"
           >
-            <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite (Recomendado/Rápido)</option>
-            <option value="gemini-3.1-flash-preview">Gemini 3.1 Flash (Balanceado)</option>
-            <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Potente)</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recomendado/Rápido y Preciso)</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Máxima Inteligencia)</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Veloz/Estable)</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legado Rápido)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legado Potente)</option>
           </select>
           
           <div className="flex justify-between items-center mb-2">

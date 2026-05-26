@@ -18,6 +18,7 @@ export interface ExerciseStat {
 export interface IAnalyticsProvider {
   trackPageView(pageName: string): Promise<void>;
   trackExerciseResult(exerciseNumber: number, result: 'APROBADO' | 'RECHAZADO'): Promise<void>;
+  trackParcialResult(parcialId: string, intento: number, nota: number, tiempoTotal: number, errores: string[]): Promise<void>;
   getGlobalStats(): Promise<GlobalStats>;
   getExerciseStats(exerciseNumber: number): Promise<ExerciseStat | null>;
 }
@@ -59,6 +60,22 @@ class LocalStorageAnalyticsProvider implements IAnalyticsProvider {
     } else {
       data.exercises[exerciseNumber].failCount += 1;
     }
+    this.saveData(data);
+  }
+
+  async trackParcialResult(parcialId: string, intento: number, nota: number, tiempoTotal: number, errores: string[]): Promise<void> {
+    const data = this.getData();
+    if (!data.parciales) {
+      data.parciales = [];
+    }
+    data.parciales.push({
+      parcialId,
+      intento,
+      nota,
+      tiempoTotal,
+      errores,
+      fecha: new Date().toISOString()
+    });
     this.saveData(data);
   }
 
@@ -163,6 +180,15 @@ class GoogleSheetsAnalyticsProvider implements IAnalyticsProvider {
         this.cache = null;
       })
       .catch(err => console.error("Error al registrar resultado:", err));
+  }
+
+  async trackParcialResult(parcialId: string, intento: number, nota: number, tiempoTotal: number, errores: string[]): Promise<void> {
+    if (!this.apiUrl) {
+      return new LocalStorageAnalyticsProvider().trackParcialResult(parcialId, intento, nota, tiempoTotal, errores);
+    }
+    const erroresStr = errores.join(',');
+    fetch(`${this.apiUrl}?action=trackParcialResult&parcialId=${encodeURIComponent(parcialId)}&intento=${intento}&nota=${nota}&tiempoTotal=${tiempoTotal}&errores=${encodeURIComponent(erroresStr)}`, { mode: 'no-cors' })
+      .catch(err => console.error("Error al registrar resultado de parcial en Sheets:", err));
   }
 
   async getGlobalStats(): Promise<GlobalStats> {

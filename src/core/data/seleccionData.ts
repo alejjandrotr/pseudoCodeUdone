@@ -9,6 +9,7 @@ import { ArticleSeleccionMultiple } from '../../components/cantera/articles/Arti
 import { ArticleVideoSeleccionMultiple } from '../../components/cantera/articles/ArticleVideoSeleccionMultiple';
 import { ArticleEjerciciosSeleccion } from '../../components/cantera/articles/ArticleEjerciciosSeleccion';
 import { ArticleEjerciciosSeleccion2 } from '../../components/cantera/articles/ArticleEjerciciosSeleccion2';
+import { ArticleEvaluacionCore } from '../../components/cantera/articles/ArticleEvaluacionCore';
 
 export const seleccionArticles: Article[] = [
   {
@@ -99,6 +100,15 @@ export const seleccionArticles: Article[] = [
     category: 'Estructuras de Selección',
     summary: 'Segunda tanda de ejercicios (11–21): corridas en frío, puntos adicionales, consecutivos, mínimo de tres, ordenación, series, par/impar, rangos, productos almacén, días de la semana y verificación de carácter.',
     component: ArticleEjerciciosSeleccion2,
+    type: 'lesson',
+  },
+  {
+    id: 'seleccion-07',
+    slug: '07-evaluacion-core',
+    title: 'Evaluación Core · Parcial 1',
+    category: 'Estructuras de Selección',
+    summary: 'Simulador de examen de pseudocódigo en base a 10. Evalúa 4 retos privados en lote con tiempo, telemetría y exportación a PDF.',
+    component: ArticleEvaluacionCore,
     type: 'lesson',
   }
 ];

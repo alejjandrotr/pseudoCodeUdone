@@ -33,6 +33,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [activeArticle, setActiveArticle] = useState<Article | null>(null);
   const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
 
+  const parcialArticle = seleccionArticles.find(a => a.slug === '07-evaluacion-core');
+
   React.useEffect(() => {
     analyticsService.getGlobalStats().then(setGlobalStats).catch(console.error);
   }, []);
@@ -41,19 +43,27 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black relative flex flex-col overflow-x-hidden">
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
       
-      <Header 
-        onNavigate={onNavigate} 
-        showButtons={!activeArticle} 
-      />
+      {activeArticle?.slug !== '07-evaluacion-core' && (
+        <Header 
+          onNavigate={onNavigate} 
+          showButtons={!activeArticle} 
+          onPresentParcial={parcialArticle ? () => {
+            setActiveArticle(parcialArticle);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } : undefined}
+        />
+      )}
 
       {/* Two-column layout */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full">
+      <div className={`max-w-7xl mx-auto px-3 sm:px-4 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full ${activeArticle?.slug === '07-evaluacion-core' ? 'pt-8' : ''}`}>
         {/* Sidebar */}
-        <ArticleSidebar
-          articles={[...fundamentosArticles, ...seleccionArticles, ...ciclosArticles]}
-          activeArticle={activeArticle}
-          onSelect={setActiveArticle}
-        />
+        {activeArticle?.slug !== '07-evaluacion-core' && (
+          <ArticleSidebar
+            articles={[...fundamentosArticles, ...seleccionArticles, ...ciclosArticles]}
+            activeArticle={activeArticle}
+            onSelect={setActiveArticle}
+          />
+        )}
 
         {/* Main content area */}
         <main className="flex-1 min-w-0">
@@ -235,6 +245,30 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                       </div>
                     </div>
                   </div>
+                </div>
+              </Section>
+
+              <Section title="7. Evaluaciones y Parciales UDONE" icon={FileText}>
+                <div className="glass-panel p-6 bg-slate-900/60 border border-slate-700/80 relative overflow-hidden rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl text-left">
+                    <h3 className="text-xl font-bold text-slate-100">Simulador de Exámenes Parciales</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Ponte a prueba en condiciones reales con nuestro simulador inteligente. Puedes realizar el **Parcial I 2025** (basado en retos de Star Wars) o la **Evaluación Core** tradicional. Incluye cronómetro, corrección automática con IA en lote, críticas personalizadas de profesores y exportación en PDF.
+                    </p>
+                  </div>
+                  {parcialArticle && (
+                    <Button
+                      variant="primary"
+                      icon={FileText}
+                      onClick={() => {
+                        setActiveArticle(parcialArticle);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="min-w-[200px] shadow-lg shadow-brand-500/10 hover:shadow-brand-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-brand-600 hover:bg-brand-500 text-white border-none"
+                    >
+                      Presentar Parcial
+                    </Button>
+                  )}
                 </div>
               </Section>
             </>

@@ -41,6 +41,24 @@ function doGet(e) {
     return createJsonResponse({ success: true });
   }
   
+  if (action === 'trackParcialResult') {
+    var parcialId = e.parameter.parcialId;
+    var intento = e.parameter.intento;
+    var nota = e.parameter.nota;
+    var tiempoTotal = e.parameter.tiempoTotal;
+    var errores = e.parameter.errores;
+    
+    var parcialSheet = sheet.getSheetByName("ParcialStats") || sheet.insertSheet("ParcialStats");
+    
+    // Si la hoja está recién creada, agregar encabezados
+    if (parcialSheet.getLastRow() === 0) {
+      parcialSheet.appendRow(["Fecha", "ParcialId", "Intento", "Nota", "TiempoTotalSegundos", "Errores"]);
+    }
+    
+    parcialSheet.appendRow([new Date(), parcialId, intento, nota, tiempoTotal, errores]);
+    return createJsonResponse({ success: true });
+  }
+  
   // Acción por defecto: Obtener estadísticas globales y agregadas
   var pageViews = {};
   var pageData = pageViewsSheet.getDataRange().getValues();

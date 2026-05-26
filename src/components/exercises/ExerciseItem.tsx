@@ -50,7 +50,7 @@ export const ExerciseItem: React.FC<ExerciseItemProps> = ({
 
   const handleEvaluate = async () => {
     const apiKey = localStorage.getItem("gemini_api_key");
-    const modelName = localStorage.getItem("gemini_model") || "gemini-3.1-flash-lite-preview";
+    const modelName = localStorage.getItem("gemini_model") || "gemini-2.5-flash";
     if (!apiKey) {
       openSettings();
       return;

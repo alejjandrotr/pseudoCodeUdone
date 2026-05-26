@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LucideIcon, ChevronRight, ChevronDown, Users, UploadCloud, ShieldCheck } from 'lucide-react';
+import { LucideIcon, ChevronRight, ChevronDown, Users, UploadCloud, ShieldCheck, FileText } from 'lucide-react';
 import { Button } from '../common/Button';
 
 interface SectionProps {
@@ -50,7 +50,8 @@ export const Section: React.FC<SectionProps> = ({
 export const Header: React.FC<{ 
   onNavigate?: (view: any) => void;
   showButtons?: boolean;
-}> = ({ onNavigate, showButtons }) => (
+  onPresentParcial?: () => void;
+}> = ({ onNavigate, showButtons, onPresentParcial }) => (
   <header className="relative py-8 md:py-16 px-4 md:px-6 max-w-5xl mx-auto text-center space-y-4 md:space-y-6 animate-fade-in z-10">
     <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-sm text-xs md:text-sm text-slate-300 mb-2 md:mb-4 hover:border-brand-500/50 transition-colors cursor-default">
       <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
@@ -62,7 +63,7 @@ export const Header: React.FC<{
     <p className="text-base md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
       Guía de referencia estándar para la asignatura Algoritmos y Estructuras de Datos I. Núcleo Nueva Esparta.
     </p>
-
+ 
     {showButtons && onNavigate && (
       <div className="flex flex-wrap justify-center gap-4 pt-4 animate-slide-up">
         <Button 
@@ -74,6 +75,17 @@ export const Header: React.FC<{
         >
           Profesores
         </Button>
+        {onPresentParcial && (
+          <Button 
+            variant="secondary"
+            size="sm" 
+            icon={FileText} 
+            onClick={onPresentParcial}
+            className="hover:-translate-y-0.5 transition-transform border-brand-500/30 hover:border-brand-500/60 text-brand-400 font-bold"
+          >
+            Presentar Parcial
+          </Button>
+        )}
         <Button 
           variant="primary"
           size="sm" 

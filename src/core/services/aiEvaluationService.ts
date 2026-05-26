@@ -64,7 +64,7 @@ export const evaluarPseudocodigo = async (
   enunciado: string,
   professor: Professor,
   apiKey: string,
-  modelName: string = "gemini-1.5-flash"
+  modelName: string = "gemini-2.5-flash"
 ): Promise<EvaluationResult> => {
 
   if (!apiKey) {
