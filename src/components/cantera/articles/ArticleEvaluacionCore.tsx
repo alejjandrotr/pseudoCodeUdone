@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Timer, ChevronRight, ChevronLeft, UserCircle2, Sparkles, 
   CheckCircle2, FileText, Mail, RefreshCw, AlertCircle, 
-  Calendar, Play, Send, Printer, Award, HelpCircle, XCircle 
+  Calendar, Play, Send, Printer, Award, HelpCircle, XCircle,
+  Boxes, Database
 } from 'lucide-react';
 
 import { PrivateExercise, ParcialConfig, UserParcialAttempt, ParcialAttemptResult } from '../../../core/types/evaluacion.types';
@@ -26,7 +27,10 @@ function generarEjerciciosExamen(config: ParcialConfig): PrivateExercise[] {
     
     config.reglasAleatorias.forEach(regla => {
       // Filtrar los ejercicios de esta categoría
-      const candidatos = privateExercisesDB.filter(ex => ex.categoria === regla.categoria);
+      let candidatos = privateExercisesDB.filter(ex => ex.categoria === regla.categoria);
+      if (config.soloExamenesPasados) {
+        candidatos = candidatos.filter(ex => ex.id.startsWith('pe_gum') || ex.id.startsWith('pe_bat'));
+      }
       if (candidatos.length === 0) return;
 
       // Clonar y barajar candidatos
@@ -421,45 +425,85 @@ export const ArticleEvaluacionCore: React.FC = () => {
       {gameState === 'intro' && (
         <div className="space-y-8 animate-fade-in">
           {/* Selector de Examen Parcial */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <h3 className="text-xl font-bold text-slate-200 flex items-center gap-2">
               <FileText size={20} className="text-brand-400" /> Selecciona el Examen Parcial a Presentar
             </h3>
-            <p className="text-sm text-slate-400">
-              Escoge cuál evaluación deseas tomar. Los retos se adaptarán a la temática y estructura del examen seleccionado.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {parcialesConfig.map((parcial) => {
-                const isSelected = parcial.id === selectedParcialId;
-                const activeBorder = isSelected 
-                  ? 'border-brand-500 bg-brand-500/5 shadow-lg shadow-brand-500/5' 
-                  : 'bg-slate-900/30 border-slate-800 hover:border-slate-700';
-                
-                return (
-                  <button
-                    key={parcial.id}
-                    onClick={() => setSelectedParcialId(parcial.id)}
-                    className={`glass-panel p-5 text-left space-y-3 cursor-pointer transition-all duration-300 flex flex-col justify-between border ${activeBorder} rounded-xl`}
-                  >
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] px-2 py-0.5 bg-slate-950 rounded font-mono text-brand-400 border border-slate-800">
-                          {parcial.tipo === 'aleatorio' ? 'Aleatorio' : 'Fijo (Estructurado)'}
-                        </span>
-                        {isSelected && (
-                          <span className="text-xs text-brand-400 font-mono font-bold flex items-center gap-1">
-                            <CheckCircle2 size={12} className="fill-slate-950 text-brand-400" /> Seleccionado
+            
+            {/* Sección: Simuladores Dinámicos */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800 pb-1 flex items-center gap-2">
+                <Boxes size={14} /> Simuladores Dinámicos (Aleatorios)
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {parcialesConfig.filter(p => p.tipo === 'aleatorio').map((parcial) => {
+                  const isSelected = parcial.id === selectedParcialId;
+                  const activeBorder = isSelected 
+                    ? 'border-brand-500 bg-brand-500/5 shadow-lg shadow-brand-500/5' 
+                    : 'bg-slate-900/30 border-slate-800 hover:border-slate-700';
+                  
+                  return (
+                    <button
+                      key={parcial.id}
+                      onClick={() => setSelectedParcialId(parcial.id)}
+                      className={`glass-panel p-5 text-left space-y-3 cursor-pointer transition-all duration-300 flex flex-col justify-between border ${activeBorder} rounded-xl`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] px-2 py-0.5 bg-slate-950 rounded font-mono text-brand-400 border border-slate-800">
+                            Aleatorio
                           </span>
+                          {isSelected && (
+                            <span className="text-xs text-brand-400 font-mono font-bold flex items-center gap-1">
+                              <CheckCircle2 size={12} className="fill-slate-950 text-brand-400" /> Seleccionado
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-bold text-slate-100 text-lg leading-tight">{parcial.titulo}</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                          {parcial.descripcion}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Sección: Modelos Fijos */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800 pb-1 flex items-center gap-2">
+                <Database size={14} /> Modelos de Años Pasados (Fijos)
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {parcialesConfig.filter(p => p.tipo === 'fijo').map((parcial) => {
+                  const isSelected = parcial.id === selectedParcialId;
+                  const activeBorder = isSelected 
+                    ? 'border-brand-500 bg-brand-500/5 shadow-md shadow-brand-500/5' 
+                    : 'bg-slate-900/30 border-slate-800 hover:border-slate-700';
+                  
+                  return (
+                    <button
+                      key={parcial.id}
+                      onClick={() => setSelectedParcialId(parcial.id)}
+                      className={`glass-panel p-4 text-left space-y-2 cursor-pointer transition-all duration-300 flex flex-col justify-between border ${activeBorder} rounded-lg`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-bold text-slate-200 text-sm leading-tight flex-grow pr-2">{parcial.titulo}</h4>
+                        {isSelected && (
+                          <CheckCircle2 size={14} className="text-brand-400 flex-shrink-0 mt-0.5" />
                         )}
                       </div>
-                      <h4 className="font-bold text-slate-100 text-lg leading-tight">{parcial.titulo}</h4>
-                      <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
+                      <p className="text-[10px] text-slate-400 leading-relaxed line-clamp-2">
                         {parcial.descripcion}
                       </p>
-                    </div>
-                  </button>
-                );
-              })}
+                      <div className="text-[9px] font-mono text-slate-500 pt-1">
+                        ID: {parcial.id}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -479,6 +523,13 @@ export const ArticleEvaluacionCore: React.FC = () => {
                 <p className="text-slate-300 text-base leading-relaxed">
                   {currentParcial.descripcion}
                 </p>
+                {currentParcial.frase && (
+                  <div className="border-l-4 border-brand-500 bg-slate-950/40 p-3 rounded-r-lg my-2 max-w-xl">
+                    <p className="text-slate-300 italic text-sm font-sans leading-relaxed">
+                      {currentParcial.frase}
+                    </p>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-4 text-xs font-mono text-slate-400 mt-2">
                   <span className="flex items-center gap-1.5"><Calendar size={14} /> Fecha: Hoy</span>
                   <span className="flex items-center gap-1.5"><FileText size={14} /> Escala: 0 a 10 Puntos</span>
@@ -760,7 +811,7 @@ export const ArticleEvaluacionCore: React.FC = () => {
                 </span>
               </div>
               <h4 className="text-lg font-bold text-slate-100">Enunciado del Reto</h4>
-              <p className="text-slate-300 text-sm leading-relaxed whitespace-normal break-words">
+              <p className="text-slate-200 text-base font-medium leading-relaxed whitespace-pre-line break-words">
                 {selectedExercises[activeExerciseIndex].enunciado}
               </p>
               <div className="pt-2 border-t border-slate-800/60 flex justify-between items-center text-xs text-slate-400 font-mono">
@@ -909,7 +960,7 @@ export const ArticleEvaluacionCore: React.FC = () => {
                       
                       <Button
                         variant="ghost"
-                        size="xs"
+                        size="sm"
                         onClick={() => {
                           setActiveExerciseIndex(index);
                           setGameState('exam');
@@ -925,7 +976,7 @@ export const ArticleEvaluacionCore: React.FC = () => {
                   <div className="p-5 space-y-4">
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-mono text-slate-500">Enunciado</span>
-                      <p className="text-slate-300 text-xs leading-relaxed max-w-4xl">{ex.enunciado}</p>
+                      <p className="text-slate-200 text-sm font-medium leading-relaxed whitespace-pre-line max-w-4xl">{ex.enunciado}</p>
                     </div>
                     
                     <div className="space-y-1">
@@ -1170,7 +1221,7 @@ export const ArticleEvaluacionCore: React.FC = () => {
                     {/* Enunciado del Ejercicio */}
                     <div className="space-y-1 text-left">
                       <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">Enunciado Oficial</span>
-                      <p className="text-slate-300 text-xs leading-relaxed print:text-slate-800">{ex.enunciado}</p>
+                      <p className="text-slate-255 text-sm font-medium leading-relaxed print:text-slate-800 whitespace-pre-line">{ex.enunciado}</p>
                     </div>
 
                     {/* Código entregado por el estudiante */}

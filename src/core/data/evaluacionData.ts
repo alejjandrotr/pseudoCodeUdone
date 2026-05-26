@@ -1,6 +1,8 @@
 import { PrivateExercise, ParcialConfig } from "../types/evaluacion.types";
+import { pastExamsDB } from "./pastExamsData";
 
 export const privateExercisesDB: PrivateExercise[] = [
+  ...pastExamsDB,
   {
     id: "pe_sec_01",
     categoria: "secuenciales",
@@ -630,10 +632,83 @@ export const parcialesConfig: ParcialConfig[] = [
     ]
   },
   {
+    id: "parcial_ap_aleatorio",
+    titulo: "Simulador Dinámico de Parciales Pasados (Aleatorio)",
+    descripcion: "Genera un parcial único escogiendo al azar 4 ejercicios reales de años anteriores de Batman y Gumball, cubriendo distintas categorías (Matemático-Lógico, Selección/Anidados, Ciclos Sencillos y Ciclos Largos).",
+    tipo: "aleatorio",
+    soloExamenesPasados: true,
+    reglasAleatorias: [
+      { categoria: "matematico-logico", cantidad: 1 },
+      { categoria: "anidados", cantidad: 1 },
+      { categoria: "ciclos-sencillos", cantidad: 1 },
+      { categoria: "ciclos-largos", cantidad: 1 }
+    ]
+  },
+  {
     id: "parcial_1_2025",
     titulo: "Parcial I 2025",
     descripcion: "Evaluación práctica de Star Wars que cubre: 1) Ciclos-Sencillos, 2) Lectura, Escritura y Asignación, 3) Matemático-Lógico, 4) Ciclos-Largos. Consta de 4 ejercicios temáticos fijos.",
     tipo: "fijo",
     ejerciciosFijos: ["pe_starwars_01", "pe_starwars_02", "pe_starwars_03", "pe_starwars_04"]
+  },
+  {
+    id: "parcial_ap_gumball_a",
+    titulo: "El Maravilloso Mundo de Gumball · Modelo A",
+    descripcion: "Ejercicios prácticos ambientados en El Increíble Mundo de Gumball: presupuesto semanal, código de acceso de seguridad a la mansión Fitzgerald, reto de resistencia de la fantasma Carrie y ranking del robot Bobert.",
+    frase: `"La vida es una carrera, pero a veces es mejor ir despacio para no perderte las cosas buenas... y para no caerte de cara." (Típico de Richard)`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_gum1_01", "pe_gum1_02", "pe_gum1_03", "pe_gum1_04"]
+  },
+  {
+    id: "parcial_ap_gumball_b",
+    titulo: "El Maravilloso Mundo de Gumball · Modelo B",
+    descripcion: "Segunda variante de ejercicios ambientados en El Increíble Mundo de Gumball: costo mensual de la bicicleta de Richard, decisión de salida a explorar de Gumball y Darwin, ahorro compuesto en la alcancía mágica y el calibrado de Bobert.",
+    frase: `“No necesitas un plan. Solo necesitas un deseo y una sorprendente falta de juicio." (Richard)`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_gum2_01", "pe_gum2_02", "pe_gum2_03", "pe_gum1_04"]
+  },
+  {
+    id: "parcial_ap_gumball_c",
+    titulo: "El Maravilloso Mundo de Gumball · Modelo C",
+    descripcion: "Tercera variante de ejercicios: costo mensual de la bicicleta de Richard, clasificación de estudiantes de secundaria Elmore por rango de edad, reto de resistencia de la fantasma Carrie y ranking de Bobert.",
+    frase: `"A veces, tienes que dejar de ser tú para poder ser tú mismo de nuevo." (Darwin)`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_gum2_01", "pe_gum3_02", "pe_gum1_03", "pe_gum1_04"]
+  },
+  {
+    id: "parcial_ap_gumball_d",
+    titulo: "El Maravilloso Mundo de Gumball · Modelo D",
+    descripcion: "Cuarta variante de ejercicios: presupuesto semanal de Gumball, decisión de salida a jugar de Gumball y Darwin, acumulación de ahorros de Darwin y ranking de Bobert.",
+    frase: `"¡Corre, Darwin, corre!" — Gumball`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_gum1_01", "pe_gum2_02", "pe_gum2_03", "pe_gum1_04"]
+  },
+  {
+    id: "parcial_ap_batman_a",
+    titulo: "Batman · Modelo A",
+    descripcion: "Ejercicios prácticos de Batman en Gotham City: cálculo de energía potencial gravitacional del Batimóvil, rastreo de villanos con crímenes pares, presupuesto del Batimóvil de piezas LEGO y toma de decisión en misión de rescate con aliados.",
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bat1_01", "pe_bat1_02", "pe_bat1_03", "pe_bat1_04"]
+  },
+  {
+    id: "parcial_ap_batman_b",
+    titulo: "Batman · Modelo B",
+    descripcion: "Segunda variante de ejercicios de Batman: Ley de Hooke en laboratorio, votación del Villano del Año en Gotham, registro y promedio de dificultad de misiones, y gestión de costos del taller de Bruce Wayne.",
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bat2_01", "pe_bat2_02", "pe_bat2_03", "pe_bat2_04"]
+  },
+  {
+    id: "parcial_ap_batman_c",
+    titulo: "Batman · Modelo C",
+    descripcion: "Tercera variante de misiones en Gotham: frecuencias de ondas sonoras, categorización de 15 misiones por dificultad, presupuesto del Batimóvil LEGO con impuestos acumulados y costos del taller de Bruce Wayne.",
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bat3_01", "pe_bat3_02", "pe_bat3_03", "pe_bat2_04"]
+  },
+  {
+    id: "parcial_ap_batman_d",
+    titulo: "Batman · Modelo D",
+    descripcion: "Cuarta variante de misiones en Gotham: distancia recorrida por el Batimóvil (MRUV), encuesta sobre el mejor vehículo de Batman, presupuesto simplificado de LEGO y registro del top de puntuaciones de misiones.",
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bat4_01", "pe_bat4_02", "pe_bat4_03", "pe_bat4_04"]
   }
 ];
