@@ -10,9 +10,14 @@
  * 5. Selecciona el engranaje > "Aplicación Web".
  * 6. Configura:
  *    - Ejecutar como: "Yo" (Tu cuenta de Google)
- *    - Quién tiene acceso: "Cualquiera"
+  *    - Quién tiene acceso: "Cualquiera"
  * 7. Haz clic en "Implementar", autoriza los permisos y copia la URL de la aplicación web generada (termina en /exec).
  * 8. Configura esa URL en tu variable de entorno de Vercel/Netlify: VITE_ANALYTICS_API_URL
+ * 
+ * NOTA DE ENTREGA GRUPAL:
+ * Las actividades grupales se registran automáticamente en la hoja "ParcialStats" usando el ParcialId "grupo_mundial_futbol"
+ * y las cédulas de los estudiantes en la columna "Errores" (formato "CI1:123,CI2:456,CI3:789") para máxima compatibilidad
+ * sin forzar una actualización del script de Google Apps Script.
  */
 
 function doGet(e) {

@@ -34,6 +34,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
 
   const parcialArticle = seleccionArticles.find(a => a.slug === '07-evaluacion-core');
+  const actividadGrupoArticle = seleccionArticles.find(a => a.slug === '08-actividad-grupo');
 
   React.useEffect(() => {
     analyticsService.getGlobalStats().then(setGlobalStats).catch(console.error);
@@ -267,6 +268,30 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                       className="min-w-[200px] shadow-lg shadow-brand-500/10 hover:shadow-brand-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-brand-600 hover:bg-brand-500 text-white border-none"
                     >
                       Presentar Parcial
+                    </Button>
+                  )}
+                </div>
+              </Section>
+
+              <Section title="8. Trabajo Práctico Grupal · Clasificatoria Mundial" icon={Users}>
+                <div className="glass-panel p-6 bg-slate-900/60 border border-slate-700/80 relative overflow-hidden rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl text-left">
+                    <h3 className="text-xl font-bold text-slate-100">Actividad Práctica de Razonamiento</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Reúnete con tu grupo de hasta 3 estudiantes y propón la solución algorítmica para desempatar y encontrar el primer y segundo lugar del mundial de fútbol. Tu entrega será evaluada de forma inmediata por el profesor seleccionado e integrada en Sheets.
+                    </p>
+                  </div>
+                  {actividadGrupoArticle && (
+                    <Button
+                      variant="primary"
+                      icon={Users}
+                      onClick={() => {
+                        setActiveArticle(actividadGrupoArticle);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="min-w-[200px] shadow-lg shadow-brand-500/10 hover:shadow-brand-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-brand-500 hover:bg-brand-400 text-slate-950 border-none"
+                    >
+                      Realizar Actividad
                     </Button>
                   )}
                 </div>

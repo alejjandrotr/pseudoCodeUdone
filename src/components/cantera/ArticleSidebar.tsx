@@ -22,6 +22,7 @@ interface ArticleSidebarProps {
 const categoryIcons: Record<string, React.ReactNode> = {
   Fundamentos: <BookOpen size={14} />,
   'Operaciones Básicas': <Terminal size={14} />,
+  'Evaluaciones y Actividades': <ClipboardCheck size={14} />,
 };
 
 const typeIcons: Record<string, React.ReactNode> = {

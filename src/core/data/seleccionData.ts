@@ -10,6 +10,7 @@ import { ArticleVideoSeleccionMultiple } from '../../components/cantera/articles
 import { ArticleEjerciciosSeleccion } from '../../components/cantera/articles/ArticleEjerciciosSeleccion';
 import { ArticleEjerciciosSeleccion2 } from '../../components/cantera/articles/ArticleEjerciciosSeleccion2';
 import { ArticleEvaluacionCore } from '../../components/cantera/articles/ArticleEvaluacionCore';
+import { ArticleActividadGrupo } from '../../components/cantera/articles/ArticleActividadGrupo';
 
 export const seleccionArticles: Article[] = [
   {
@@ -44,7 +45,7 @@ export const seleccionArticles: Article[] = [
     slug: '03-seleccion-doble',
     title: 'Selección Doble (Si-Sino)',
     category: 'Estructuras de Selección',
-    summary: 'Cómo manejar alternativas con Si-Sino y el concepto fundamental de la anidación.',
+    summary: 'Cómo manejar alternativas con Si-Sino y el concept fundamental de la anidación.',
     component: ArticleSeleccionDoble,
     type: 'lesson',
   },
@@ -106,9 +107,18 @@ export const seleccionArticles: Article[] = [
     id: 'seleccion-07',
     slug: '07-evaluacion-core',
     title: 'Evaluación Core · Parcial 1',
-    category: 'Estructuras de Selección',
+    category: 'Evaluaciones y Actividades',
     summary: 'Simulador de examen de pseudocódigo en base a 10. Evalúa 4 retos privados en lote con tiempo, telemetría y exportación a PDF.',
     component: ArticleEvaluacionCore,
+    type: 'lesson',
+  },
+  {
+    id: 'seleccion-08',
+    slug: '08-actividad-grupo',
+    title: 'Actividad Grupal · Clasificatoria Mundial',
+    category: 'Evaluaciones y Actividades',
+    summary: 'Reto en equipo de 3. Explica el razonamiento lógico para determinar el primer y segundo lugar con desempate por diferencia de goles.',
+    component: ArticleActividadGrupo,
     type: 'lesson',
   }
 ];

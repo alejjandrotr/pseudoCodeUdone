@@ -19,6 +19,7 @@ export interface IAnalyticsProvider {
   trackPageView(pageName: string): Promise<void>;
   trackExerciseResult(exerciseNumber: number, result: 'APROBADO' | 'RECHAZADO'): Promise<void>;
   trackParcialResult(parcialId: string, intento: number, nota: number, tiempoTotal: number, errores: string[]): Promise<void>;
+  trackActividadGrupoResult(integrantes: string[], nota: number, aprobado: boolean): Promise<void>;
   getGlobalStats(): Promise<GlobalStats>;
   getExerciseStats(exerciseNumber: number): Promise<ExerciseStat | null>;
 }
@@ -77,6 +78,11 @@ class LocalStorageAnalyticsProvider implements IAnalyticsProvider {
       fecha: new Date().toISOString()
     });
     this.saveData(data);
+  }
+
+  async trackActividadGrupoResult(integrantes: string[], nota: number, aprobado: boolean): Promise<void> {
+    const errorList = integrantes.map((ci, idx) => `CI${idx + 1}:${ci}`);
+    return this.trackParcialResult("grupo_mundial_futbol", 1, nota, 0, errorList);
   }
 
   async getGlobalStats(): Promise<GlobalStats> {
@@ -189,6 +195,11 @@ class GoogleSheetsAnalyticsProvider implements IAnalyticsProvider {
     const erroresStr = errores.join(',');
     fetch(`${this.apiUrl}?action=trackParcialResult&parcialId=${encodeURIComponent(parcialId)}&intento=${intento}&nota=${nota}&tiempoTotal=${tiempoTotal}&errores=${encodeURIComponent(erroresStr)}`, { mode: 'no-cors' })
       .catch(err => console.error("Error al registrar resultado de parcial en Sheets:", err));
+  }
+
+  async trackActividadGrupoResult(integrantes: string[], nota: number, aprobado: boolean): Promise<void> {
+    const errorList = integrantes.map((ci, idx) => `CI${idx + 1}:${ci}`);
+    return this.trackParcialResult("grupo_mundial_futbol", 1, nota, 0, errorList);
   }
 
   async getGlobalStats(): Promise<GlobalStats> {
