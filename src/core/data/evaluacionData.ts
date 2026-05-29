@@ -710,5 +710,29 @@ export const parcialesConfig: ParcialConfig[] = [
     descripcion: "Cuarta variante de misiones en Gotham: distancia recorrida por el Batimóvil (MRUV), encuesta sobre el mejor vehículo de Batman, presupuesto simplificado de LEGO y registro del top de puntuaciones de misiones.",
     tipo: "fijo",
     ejerciciosFijos: ["pe_bat4_01", "pe_bat4_02", "pe_bat4_03", "pe_bat4_04"]
+  },
+  {
+    id: "parcial_ap_bob_esponja_a",
+    titulo: "Bob Esponja · Modelo A (2026)",
+    descripcion: "Ejercicios prácticos de Bob Esponja en Fondo de Bikini: cálculo del volumen de la piña, examen de conducir de la Sra. Puff, crecimiento de medusas Fibonacci y caja registradora del Crustáceo Cascarudo.",
+    frase: `"No es secreto que lo mejor de un secreto es decirle secretamente a alguien de tu secreto. Así agregas otro secreto a su secreta colección de secretos, secretamente." — Bob Esponja`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bob_2026_01", "pe_bob_2026_02", "pe_bob_2026_03", "pe_bob_2026_04"]
+  },
+  {
+    id: "parcial_ap_bob_esponja_b",
+    titulo: "Bob Esponja · Modelo B (2026)",
+    descripcion: "Variante B del Parcial I 2026 Bob Esponja. Contiene los mismos retos prácticos en Fondo de Bikini con una dedicatoria y enfoque diferente de Calamardo.",
+    frase: `"Qué mal que Bob Esponja no está aquí para disfrutar que Bob Esponja no está aquí." — Calamardo`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bob_2026_01", "pe_bob_2026_02", "pe_bob_2026_03", "pe_bob_2026_04"]
+  },
+  {
+    id: "parcial_ap_bob_esponja_c",
+    titulo: "Bob Esponja · Modelo C (2026)",
+    descripcion: "Variante C del Parcial I 2026 Bob Esponja. Contiene retos de arquitectura residencial en Fondo de Bikini, la pirámide de centavos de Don Cangrejo, el examen de conducir de la Sra. Puff y el Crustáceo Cascarudo.",
+    frase: `"¡Espera Bob Esponja, no somos cavernícolas! Tenemos tecnología." — Patricio Estrella`,
+    tipo: "fijo",
+    ejerciciosFijos: ["pe_bob_2026_05", "pe_bob_2026_02", "pe_bob_2026_06", "pe_bob_2026_04"]
   }
 ];
