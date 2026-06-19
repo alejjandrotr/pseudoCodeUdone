@@ -154,7 +154,12 @@ export const StudentDashboardPage: React.FC = () => {
                     <FileText className="w-6 h-6 text-blue-400" />
                   </div>
                   <div className="pr-24">
-                    <h3 className="text-lg font-bold text-white mb-1">{project.nombre}</h3>
+                    <h3 
+                      className="text-lg font-bold text-white mb-1 cursor-pointer hover:text-blue-400 transition-colors"
+                      onClick={() => navigate(`/proyecto/${project.id}`)}
+                    >
+                      {project.nombre}
+                    </h3>
                     <p className="text-sm text-slate-400 line-clamp-2">{project.descripcion || "Sin descripción"}</p>
                   </div>
                 </div>

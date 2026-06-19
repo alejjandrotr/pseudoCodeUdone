@@ -7,6 +7,7 @@ import { LoginPage } from './pages/auth/LoginPage'
 import { ChangePasswordPage } from './pages/auth/ChangePasswordPage'
 import { StudentDashboardPage } from './pages/student/StudentDashboardPage'
 import { ProjectDeliveryPage } from './pages/student/ProjectDeliveryPage'
+import { ProjectDetailPage } from './pages/student/ProjectDetailPage'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/login-estudiantes" element={<LoginPage />} />
         <Route path="/cambiar-password" element={<ChangePasswordPage />} />
         <Route path="/dashboard" element={<StudentDashboardPage />} />
+        <Route path="/proyecto/:projectId" element={<ProjectDetailPage />} />
         <Route path="/entregar/:projectId" element={<ProjectDeliveryPage />} />
       </Routes>
     </BrowserRouter>

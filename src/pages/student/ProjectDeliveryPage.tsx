@@ -27,6 +27,9 @@ export const ProjectDeliveryPage: React.FC = () => {
   const [pseudoFile, setPseudoFile] = useState<File | null>(null);
   const [codeFile, setCodeFile] = useState<File | null>(null);
   const [apiKey, setApiKey] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [pseudoPreview, setPseudoPreview] = useState('');
+  const [codePreview, setCodePreview] = useState('');
   
   // UI State
   const [loading, setLoading] = useState(true);
@@ -35,6 +38,33 @@ export const ProjectDeliveryPage: React.FC = () => {
   const [warning, setWarning] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
+
+  // File Preview Effects
+  useEffect(() => {
+    if (pseudoFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        setPseudoPreview(text.slice(0, 1000) + (text.length > 1000 ? '\n... (truncado)' : ''));
+      };
+      reader.readAsText(pseudoFile);
+    } else {
+      setPseudoPreview('');
+    }
+  }, [pseudoFile]);
+
+  useEffect(() => {
+    if (codeFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        setCodePreview(text.slice(0, 1000) + (text.length > 1000 ? '\n... (truncado)' : ''));
+      };
+      reader.readAsText(codeFile);
+    } else {
+      setCodePreview('');
+    }
+  }, [codeFile]);
 
   useEffect(() => {
     fetchInitialData();
@@ -174,15 +204,27 @@ export const ProjectDeliveryPage: React.FC = () => {
       const basePath = `proyecto${projectId}/${groupId}/archivosGenerados`;
       
       await supabase.storage.from('student-deliveries').upload(`${basePath}/pseudocodigo.txt`, pseudoFile);
-      await supabase.storage.from('student-deliveries').upload(`${basePath}/codigo.${codeFile.name.split('.').pop()}`, codeFile);
+      const codeExt = codeFile.name.split('.').pop();
+      await supabase.storage.from('student-deliveries').upload(`${basePath}/codigo.${codeExt}`, codeFile);
       
       const transcriptBlob = new Blob([transcript], { type: 'text/plain' });
       await supabase.storage.from('student-deliveries').upload(`${basePath}/transcripcion.txt`, transcriptBlob);
 
+      // Get public URLs
+      const { data: { publicUrl: pseudoUrl } } = supabase.storage.from('student-deliveries').getPublicUrl(`${basePath}/pseudocodigo.txt`);
+      const { data: { publicUrl: codeUrl } } = supabase.storage.from('student-deliveries').getPublicUrl(`${basePath}/codigo.${codeExt}`);
+
       // 4. Record Delivery
       const { data: deliveryData, error: deliveryError } = await supabase
         .from('deliveries')
-        .insert([{ project_id: projectId, group_id: groupId, status: 'submitted' }])
+        .insert([{ 
+          project_id: projectId, 
+          group_id: groupId, 
+          status: 'submitted',
+          pseudo_url: pseudoUrl,
+          code_url: codeUrl,
+          transcript: transcript
+        }])
         .select()
         .single();
       if (deliveryError) throw deliveryError;
@@ -196,19 +238,33 @@ export const ProjectDeliveryPage: React.FC = () => {
           
           const pseudoText = await pseudoFile.text();
           const codeText = await codeFile.text();
+
+          // Fetch project requirements markdown if available
+          let projectRequirements = project?.descripcion || '';
+          if (project?.content_url) {
+            try {
+              const mdRes = await fetch(project.content_url);
+              if (mdRes.ok) projectRequirements = await mdRes.text();
+            } catch { /* fallback to descripcion */ }
+          }
           
           const prompt = `
             Actúa como un profesor estricto de programación.
             Evalúa la siguiente entrega de proyecto.
-            Pseudocódigo:
+
+            ## ENUNCIADO DEL PROYECTO (lo que se les pidió):
+            ${projectRequirements}
+
+            ## PSEUDOCÓDIGO ENTREGADO:
             ${pseudoText}
             
-            Código Fuente:
+            ## CÓDIGO FUENTE ENTREGADO:
             ${codeText}
             
-            Explicación transcrita del estudiante:
+            ## EXPLICACIÓN ORAL DEL ESTUDIANTE:
             ${transcript}
             
+            Evalúa si la entrega cumple con los requerimientos del enunciado.
             Debes responder ESTRICTAMENTE en formato JSON con la siguiente estructura:
             {
               "puntuacion": (numero entero del 0 al 25),
@@ -271,16 +327,31 @@ export const ProjectDeliveryPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-blue-400" /> 1. Formación de Equipo</h2>
             <p className="text-sm text-slate-400 mb-4">Selecciona a tus compañeros (Mínimo {project?.min_members}, Máximo {project?.max_members}).</p>
             
+            <input 
+              type="text" 
+              placeholder="Buscar compañero por nombre o cédula..." 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full mb-4 bg-slate-950 border border-slate-850 text-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-slate-500"
+            />
+
             <div className="max-h-48 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-              {availableStudents.map(s => (
-                <label key={s.cedula} className="flex items-center gap-3 p-3 bg-slate-950 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700 transition-colors">
-                  <input type="checkbox" checked={selectedGroupMembers.includes(s.cedula)} onChange={() => toggleMember(s.cedula)} className="rounded border-slate-700 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900" />
-                  <div>
-                    <p className="text-sm font-medium text-slate-200">{s.nombres} {s.apellidos}</p>
-                    <p className="text-xs text-slate-500">C.I: {s.cedula}</p>
-                  </div>
-                </label>
-              ))}
+              {availableStudents
+                .filter(s => {
+                  const term = searchTerm.toLowerCase();
+                  return s.nombres.toLowerCase().includes(term) || 
+                         s.apellidos.toLowerCase().includes(term) || 
+                         s.cedula.includes(term);
+                })
+                .map(s => (
+                  <label key={s.cedula} className="flex items-center gap-3 p-3 bg-slate-950 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700 transition-colors">
+                    <input type="checkbox" checked={selectedGroupMembers.includes(s.cedula)} onChange={() => toggleMember(s.cedula)} className="rounded border-slate-700 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900" />
+                    <div>
+                      <p className="text-sm font-medium text-slate-200">{s.nombres} {s.apellidos}</p>
+                      <p className="text-xs text-slate-500">C.I: {s.cedula}</p>
+                    </div>
+                  </label>
+                ))}
               {availableStudents.length === 0 && <p className="text-slate-500 text-sm italic">No hay compañeros disponibles.</p>}
             </div>
           </section>
@@ -314,10 +385,22 @@ export const ProjectDeliveryPage: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Pseudocódigo (.txt)</label>
                 <input type="file" accept=".txt" onChange={e => setPseudoFile(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20" />
+                {pseudoPreview && (
+                  <div className="mt-3">
+                    <p className="text-xs text-slate-500 mb-1 font-semibold">Previsualización:</p>
+                    <pre className="p-3 bg-slate-950 border border-slate-850 rounded-lg text-[11px] font-mono text-slate-400 max-h-40 overflow-y-auto whitespace-pre-wrap leading-relaxed">{pseudoPreview}</pre>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Código Fuente (C, C++, Pascal, TS)</label>
                 <input type="file" accept=".c,.cpp,.pas,.ts,.txt" onChange={e => setCodeFile(e.target.files?.[0] || null)} className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-500/10 file:text-green-400 hover:file:bg-green-500/20" />
+                {codePreview && (
+                  <div className="mt-3">
+                    <p className="text-xs text-slate-500 mb-1 font-semibold">Previsualización:</p>
+                    <pre className="p-3 bg-slate-950 border border-slate-850 rounded-lg text-[11px] font-mono text-slate-400 max-h-40 overflow-y-auto whitespace-pre-wrap leading-relaxed">{codePreview}</pre>
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -325,7 +408,18 @@ export const ProjectDeliveryPage: React.FC = () => {
           {/* Step 4: AI Config */}
           <section className="bg-slate-900 border border-slate-800 p-6 rounded-xl">
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2"><Bot className="w-5 h-5 text-blue-400" /> 4. Validación Inteligente (Opcional)</h2>
-            <p className="text-sm text-slate-400 mb-4">Ingresa tu Token de API para realizar la revisión preeliminar de tu código.</p>
+            <p className="text-sm text-slate-400 mb-2">Ingresa tu Token de API para realizar la revisión preeliminar de tu código.</p>
+            <p className="text-xs text-slate-500 mb-4">
+              ¿No tienes una API Key? Puedes conseguir una gratis en{' '}
+              <a 
+                href="https://aistudio.google.com/app/apikey" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-blue-400 hover:text-blue-300 underline font-medium"
+              >
+                Google AI Studio
+              </a>.
+            </p>
             <input type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="API Key (Gemini)" className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" />
           </section>
 
