@@ -296,6 +296,27 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   )}
                 </div>
               </Section>
+
+              <Section title="9. Portal Estudiantil de Entregas" icon={UploadCloud}>
+                <div className="glass-panel p-6 bg-slate-900/60 border border-slate-700/80 relative overflow-hidden rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl text-left">
+                    <h3 className="text-xl font-bold text-slate-100">Gestor de Proyectos de Programación</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Accede con tu cédula de identidad para formar tu equipo, subir tus proyectos de programación y realizar la sustentación oral (dictado). Tus entregas serán pre-evaluadas y recibirás preguntas de defensa.
+                    </p>
+                  </div>
+                  <Button
+                    variant="primary"
+                    icon={UploadCloud}
+                    onClick={() => {
+                      window.location.href = '/login-estudiantes';
+                    }}
+                    className="min-w-[200px] shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-blue-600 hover:bg-blue-500 text-white border-none"
+                  >
+                    Acceder al Portal
+                  </Button>
+                </div>
+              </Section>
             </>
           )}
         </main>
