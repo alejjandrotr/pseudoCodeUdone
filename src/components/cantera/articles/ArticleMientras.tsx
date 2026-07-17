@@ -48,9 +48,8 @@ export const ArticleMientras: React.FC = () => {
     '    Fin Mientras',
     '    Escribir "El resultado de la multiplicación es: " + resultado',
     'Fin'
-  ];
-
-  // Auto-play timer logic
+  ]
+    // Auto-play timer logic
   useEffect(() => {
     if (isPlaying && !isWaitingInput) {
       intervalRef.current = setInterval(() => {
@@ -121,16 +120,16 @@ export const ArticleMientras: React.FC = () => {
         setActiveLine(10);
         setResultado(0);
         setRamHighlight('resultado');
-        setDebugLogs(prev => [...prev, '> [Línea 10] Memoria: resultado <- 0 (Acumulador listo)']);
-        setSimStep(3);
+        setDebugLogs(prev => [...prev, '> [Línea 10] Memoria: resultado <- 0 (Acumulador listo)'])
+    setSimStep(3);
         break;
       case 3:
         // Initialize controlador to 0 (Line 11)
         setActiveLine(11);
         setControlador(0);
         setRamHighlight('controlador');
-        setDebugLogs(prev => [...prev, '> [Línea 11] Memoria: controlador <- 0 (Contador listo)']);
-        setSimStep(4);
+        setDebugLogs(prev => [...prev, '> [Línea 11] Memoria: controlador <- 0 (Contador listo)'])
+    setSimStep(4);
         break;
       case 4:
         // Check Mientras condition (Line 12)
@@ -154,8 +153,8 @@ export const ArticleMientras: React.FC = () => {
         const nextResult = resultado + multiplicando;
         setResultado(nextResult);
         setRamHighlight('resultado');
-        setDebugLogs(prev => [...prev, `> [Línea 13] Acumulador: resultado <- ${resultado} + ${multiplicando} ➔ ${nextResult}`]);
-        setSimStep(6);
+        setDebugLogs(prev => [...prev, `> [Línea 13] Acumulador: resultado <- ${resultado} + ${multiplicando} ➔ ${nextResult}`])
+    setSimStep(6);
         break;
       case 6:
         // Increment (Line 14)
@@ -163,8 +162,8 @@ export const ArticleMientras: React.FC = () => {
         const nextControlador = controlador + 1;
         setControlador(nextControlador);
         setRamHighlight('controlador');
-        setDebugLogs(prev => [...prev, `> [Línea 14] Contador: controlador <- ${controlador} + 1 ➔ ${nextControlador}`]);
-        setSimStep(4); // Loop back to check condition
+        setDebugLogs(prev => [...prev, `> [Línea 14] Contador: controlador <- ${controlador} + 1 ➔ ${nextControlador}`])
+    setSimStep(4); // Loop back to check condition
         break;
       case 7:
         // Fin Mientras (Line 15)

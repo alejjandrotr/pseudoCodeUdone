@@ -10,8 +10,8 @@ export const ArticleVideoPara: React.FC = () => {
   const [i, setI] = useState<number | null>(null);
   
   const [simStep, setSimStep] = useState<number>(0); // 0 = ready, 1 = wait quantity, 2 = init loop index i <- 1, 3 = check i <= quantity, 4 = wait number, 5 = accumulate, 6 = increment index, 7 = print final sum, 8 = finished
-  const [activeLine, setActiveLine] = useState<number | null>(null);
-  const [ramHighlight, setRamHighlight] = useState<string | null>(null); // 'suma' | 'cantidad' | 'numero' | 'i' | null
+  const [activeLine, setActiveLine] = useState<number | null>(null)
+    const [ramHighlight, setRamHighlight] = useState<string | null>(null); // 'suma' | 'cantidad' | 'numero' | 'i' | null
   
   // Dual-Terminal Log States
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
@@ -65,16 +65,15 @@ export const ArticleVideoPara: React.FC = () => {
     '    suma <- 0',
     '    Escribir "Ingrese la cantidad de números a sumar: "',
     '    Leer cantidad_numeros',
-    '    Para i <- 1 Hasta cantidad_numeros Hacer',
+    '    Para i = 1 Hasta cantidad_numeros',
     '        Escribir "Ingrese un número: "',
     '        Leer numero',
     '        suma <- suma + numero',
     '    Fin Para',
     '    Escribir "La suma total es: " + suma',
     'Fin'
-  ];
-
-  // Auto-play timer
+  ]
+    // Auto-play timer
   useEffect(() => {
     if (isPlaying && !isWaitingInput) {
       intervalRef.current = setInterval(() => {
@@ -120,8 +119,8 @@ export const ArticleVideoPara: React.FC = () => {
         setActiveLine(5);
         setSuma(0);
         setRamHighlight('suma');
-        setDebugLogs(prev => [...prev, '> [Línea 5] Memoria: inicializando suma <- 0']);
-        setSimStep(1);
+        setDebugLogs(prev => [...prev, '> [Línea 5] Memoria: inicializando suma <- 0'])
+    setSimStep(1);
         break;
       case 1:
         // Write prompt & Leer quantity of numbers (Lines 6 & 7)
@@ -139,8 +138,8 @@ export const ArticleVideoPara: React.FC = () => {
         setActiveLine(8);
         setI(1);
         setRamHighlight('i');
-        setDebugLogs(prev => [...prev, '> [Línea 8] Para i <- 1: Inicializando índice de control a 1']);
-        setSimStep(3);
+        setDebugLogs(prev => [...prev, '> [Línea 8] Para i <- 1: Inicializando índice de control a 1'])
+    setSimStep(3);
         break;
       case 3:
         // Check loop boundary i <= cantidad_numeros (Line 8)
@@ -176,8 +175,8 @@ export const ArticleVideoPara: React.FC = () => {
         const newSuma = state.suma + (state.currentNumber ?? 0);
         setSuma(newSuma);
         setRamHighlight('suma');
-        setDebugLogs(prev => [...prev, `> [Línea 11] Acumulador: suma <- ${prevSuma} + ${state.currentNumber} ➔ ${newSuma}`]);
-        setSimStep(6);
+        setDebugLogs(prev => [...prev, `> [Línea 11] Acumulador: suma <- ${prevSuma} + ${state.currentNumber} ➔ ${newSuma}`])
+    setSimStep(6);
         break;
       case 6:
         // Increment Index automatically (Line 12)

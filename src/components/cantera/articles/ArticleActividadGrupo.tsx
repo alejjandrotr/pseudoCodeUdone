@@ -241,8 +241,14 @@ INICIO
   Escribir "Indique el nombre del equipo 4"
   leer nombreD
 
-  ptsA <- 0; ptsB <- 0; ptsC <- 0; ptsD <- 0      
-  diffA <- 0; diffB <- 0; diffC <- 0; diffD <- 0     
+  ptsA <- 0
+    ptsB <- 0
+    ptsC <- 0
+    ptsD <- 0      
+  diffA <- 0
+    diffB <- 0
+    diffC <- 0
+    diffD <- 0     
 
   // [Ejemplo de Simulación de Partido: A VS B]
   Escribir nombreA, ' VS ', nombreB
@@ -321,8 +327,8 @@ FIN`} />
             </h3>
             <div className="flex gap-2 overflow-x-auto pb-1">
               {professorsData.map((prof) => {
-                const isSelected = prof.id === selectedProfId;
-                return (
+                const isSelected = prof.id === selectedProfId
+    return (
                   <button
                     key={prof.id}
                     onClick={() => !evaluationResult && setSelectedProfId(prof.id)}

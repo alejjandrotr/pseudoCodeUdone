@@ -12,7 +12,8 @@ import {
   UploadCloud,
   Activity,
   CheckCircle,
-  XCircle
+  XCircle,
+  Code2
 } from 'lucide-react';
 import { Section, Header, Footer } from '../components/layout/Layout';
 import { CodeBlock } from '../components/common/DisplayComponents';
@@ -22,11 +23,12 @@ import { ArticleView } from '../components/cantera/ArticleView';
 import { fundamentosArticles } from '../core/data/fundamentosData';
 import { seleccionArticles } from '../core/data/seleccionData';
 import { ciclosArticles } from '../core/data/ciclosData';
+import { arreglosArticles } from '../core/data/arreglosData';
 import { Article } from '../core/types/article';
 import { analyticsService, GlobalStats } from '../core/services/analyticsService';
 
 interface HomePageProps {
-  onNavigate: (view: 'acciones_basicas' | 'ejercicios_secuenciacion' | 'professors' | 'custom_exercise' | 'flow_demo' | 'loop_flow_demo') => void;
+  onNavigate: (view: 'acciones_basicas' | 'ejercicios_secuenciacion' | 'professors' | 'custom_exercise' | 'flow_demo' | 'loop_flow_demo' | 'laboratory' | 'exam_dashboard') => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
@@ -56,11 +58,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       )}
 
       {/* Two-column layout */}
-      <div className={`max-w-7xl mx-auto px-3 sm:px-4 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full ${activeArticle?.slug === '07-evaluacion-core' ? 'pt-8' : ''}`}>
+      <div className={`max-w-[100rem] mx-auto px-3 sm:px-6 lg:px-8 pb-28 md:pb-24 relative z-10 flex-grow flex flex-col md:flex-row gap-6 w-full ${activeArticle?.slug === '07-evaluacion-core' ? 'pt-8' : ''}`}>
         {/* Sidebar */}
         {activeArticle?.slug !== '07-evaluacion-core' && (
           <ArticleSidebar
-            articles={[...fundamentosArticles, ...seleccionArticles, ...ciclosArticles]}
+            articles={[...fundamentosArticles, ...seleccionArticles, ...ciclosArticles, ...arreglosArticles]}
             activeArticle={activeArticle}
             onSelect={setActiveArticle}
           />
@@ -229,6 +231,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                         <p className="text-xs text-slate-400 mt-1 uppercase tracking-tighter">Bidimensional (Matriz) Ej: M[f,c]</p>
                       </div>
                     </div>
+                    <div className="mt-4 flex flex-wrap gap-4">
+                      <Button 
+                        variant="ghost" 
+                        icon={BookOpen} 
+                        onClick={() => setActiveArticle(arreglosArticles[0])}
+                      >
+                        Introducción a los Arreglos
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        icon={ChevronRight} 
+                        onClick={() => setActiveArticle(arreglosArticles[2])}
+                      >
+                        Iterando Arreglos (Para)
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-8">
@@ -314,6 +332,43 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     className="min-w-[200px] shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-blue-600 hover:bg-blue-500 text-white border-none"
                   >
                     Acceder al Portal
+                  </Button>
+                </div>
+              </Section>
+              <Section title="10. Laboratorio de Código (Beta)" icon={Code2}>
+                <div className="glass-panel p-6 bg-slate-900/60 border border-slate-700/80 relative overflow-hidden rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl text-left">
+                    <h3 className="text-xl font-bold text-slate-100">Evaluador en Tiempo Real</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Escribe código en JavaScript o TypeScript y evalúalo de forma segura en tu propio navegador sin afectar el rendimiento de la plataforma. (Fase 1 completada, C++ en fase de WebAssembly).
+                    </p>
+                  </div>
+                  <Button
+                    variant="primary"
+                    icon={Code2}
+                    onClick={() => onNavigate('laboratory')}
+                    className="min-w-[200px] shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-purple-600 hover:bg-purple-500 text-white border-none"
+                  >
+                    Abrir Laboratorio
+                  </Button>
+                </div>
+              </Section>
+              
+              <Section title="11. Parcial Virtual de Código (Fase 3)" icon={Code2}>
+                <div className="glass-panel p-6 bg-slate-900/60 border border-slate-700/80 relative overflow-hidden rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl text-left">
+                    <h3 className="text-xl font-bold text-slate-100">Evaluación Automática Controlada</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Presenta el parcial virtual de código. Tendrás ejercicios aleatorios del banco y un límite de tiempo. Evaluado mediante IA y pruebas automáticas.
+                    </p>
+                  </div>
+                  <Button
+                    variant="primary"
+                    icon={Terminal}
+                    onClick={() => onNavigate('exam_dashboard')}
+                    className="min-w-[200px] shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all py-3 font-bold bg-emerald-600 hover:bg-emerald-500 text-white border-none"
+                  >
+                    Presentar Parcial
                   </Button>
                 </div>
               </Section>

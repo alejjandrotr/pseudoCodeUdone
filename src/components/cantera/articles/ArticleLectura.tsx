@@ -11,9 +11,8 @@ export const ArticleLectura: React.FC = () => {
     Leer tiempo
     velocidad <- distancia / tiempo
     Escribir "La velocidad calculada es: " + velocidad + " km/h"
-FinAlgoritmo`;
-
-  const initialE1: VariableState[] = [
+FinAlgoritmo`
+    const initialE1: VariableState[] = [
     { name: 'distancia', value: null, type: 'number' },
     { name: 'tiempo', value: null, type: 'number' },
     { name: 'velocidad', value: null, type: 'number' }
@@ -33,9 +32,8 @@ FinAlgoritmo`;
     Leer lado
     area <- lado * lado
     Escribir "El área del cuadrado es: " + area
-FinAlgoritmo`;
-
-  const initialE2: VariableState[] = [
+FinAlgoritmo`
+    const initialE2: VariableState[] = [
     { name: 'lado', value: null, type: 'number' },
     { name: 'area', value: null, type: 'number' }
   ];

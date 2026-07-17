@@ -157,9 +157,9 @@
     "nota": "La condición se evalúa AL INICIO. Si es Falsa desde el principio, el cuerpo NO se ejecuta. FLEXIBILIDAD: 'Fin Mientras' es insensible a mayúsculas/minúsculas."
   },
   "ciclo_para": {
-    "formato": "Para <Variable> <- Vi Hasta Vf [Inc | Dec valor]\n  ...\nFin Para",
-    "ejemplo": "Para i <- 1 Hasta 10\n  ...\nFin Para",
-    "nota": "El incremento/decremento es OPCIONAL. Si se omite, se asume incremento de 1. La variable de control usa '<-'. NO usar '=' aquí. FLEXIBILIDAD: 'Fin Para' es insensible a mayúsculas/minúsculas."
+    "formato": "Para <Variable> = Vi Hasta Vf [Inc o Dec valor]\n  ...\nFin Para",
+    "ejemplo": "Para i = 1 Hasta 10\n  ...\nFin Para",
+    "nota": "El incremento/decremento es OPCIONAL. Si se omite, se asume incremento de 1 (Inc 1). La variable de control usa '=' (ej: Para i = 1 Hasta 10). NO usar 'Con Paso', usar 'Inc' o 'Dec'. FLEXIBILIDAD: 'Fin Para' es insensible a mayúsculas/minúsculas."
   },
   "procedimientos": {
     "definicion_formato": "Procedimiento <Nombre> [(Parámetros)]\n  Declaración\nInicio\n  ...\nFin Procedimiento",

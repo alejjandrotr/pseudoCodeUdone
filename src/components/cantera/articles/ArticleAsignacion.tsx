@@ -7,9 +7,8 @@ export const ArticleAsignacion: React.FC = () => {
     lado <- 5
     area <- lado * lado
     Escribir "El área del cuadrado es: " + area
-FinAlgoritmo`;
-
-  const initialE1: VariableState[] = [
+FinAlgoritmo`
+    const initialE1: VariableState[] = [
     { name: 'lado', value: null, type: 'number' },
     { name: 'area', value: null, type: 'number' }
   ];
@@ -25,9 +24,8 @@ FinAlgoritmo`;
     tiempo <- 2
     velocidad <- distancia / tiempo
     Escribir "La velocidad es: " + velocidad + " km/h"
-FinAlgoritmo`;
-
-  const initialE2: VariableState[] = [
+FinAlgoritmo`
+    const initialE2: VariableState[] = [
     { name: 'distancia', value: null, type: 'number' },
     { name: 'tiempo', value: null, type: 'number' },
     { name: 'velocidad', value: null, type: 'number' }
@@ -44,9 +42,8 @@ FinAlgoritmo`;
     nombre <- "Juan Pérez"
     cedula <- "V-12345678"
     Escribir "Registrado: " + nombre + " con CI: " + cedula
-FinAlgoritmo`;
-
-  const initialE3: VariableState[] = [
+FinAlgoritmo`
+    const initialE3: VariableState[] = [
     { name: 'nombre', value: null, type: 'string' },
     { name: 'cedula', value: null, type: 'string' }
   ];

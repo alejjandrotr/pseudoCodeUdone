@@ -69,15 +69,14 @@ export const ArticlePara: React.FC = () => {
     '    Escribir "Ingrese el número de la tabla: "',
     '    Leer tabla',
     '    Escribir "Generando tabla de: ", tabla',
-    '    Para i <- 1 Hasta 10 Con Paso 1 Hacer',
+    '    Para i = 1 Hasta 10 Inc 1',
     '        resultado <- tabla * i',
     '        Escribir tabla, " x ", i, " = ", resultado',
     '    Fin Para',
     '    Escribir "Proceso finalizado con éxito."',
     'Fin'
-  ];
-
-  // Auto-play timer logic
+  ]
+    // Auto-play timer logic
   useEffect(() => {
     if (isPlaying && !isWaitingInput) {
       intervalRef.current = setInterval(() => {
@@ -151,8 +150,8 @@ export const ArticlePara: React.FC = () => {
         setDebugLogs(prev => [
           ...prev, 
           `> [Línea 9] Inicializar bucle Para: i <- ${startingVal}. Límite: ${state.valorFinal}, Paso: ${state.paso}`
-        ]);
-        setSimStep(4);
+        ])
+    setSimStep(4);
         break;
       case 4:
         // Multiply result (Line 10)
@@ -161,8 +160,8 @@ export const ArticlePara: React.FC = () => {
         const res = state.tablaNum * currentI;
         setResultado(res);
         setRamHighlight('resultado');
-        setDebugLogs(prev => [...prev, `> [Línea 10] Multiplicación: resultado <- ${state.tablaNum} * ${currentI} ➔ ${res}`]);
-        setSimStep(5);
+        setDebugLogs(prev => [...prev, `> [Línea 10] Multiplicación: resultado <- ${state.tablaNum} * ${currentI} ➔ ${res}`])
+    setSimStep(5);
         break;
       case 5:
         // Write row (Line 11)

@@ -25,9 +25,8 @@ export const ArticleCiclosIntroduccion: React.FC = () => {
     '    estudiantes <- estudiantes + 1',
     '  Fin Mientras',
     'Fin'
-  ];
-
-  // Simulation execution loop
+  ]
+    // Simulation execution loop
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
@@ -58,9 +57,10 @@ export const ArticleCiclosIntroduccion: React.FC = () => {
     switch (simStep) {
       case 0:
         // Initialize estudiantes <- 0
-        setActiveLine(5); // line 5: estudiantes <- 0
-        setEstudiantes(0);
-        setSeats(Array(12).fill(false));
+        setActiveLine(5)
+    // line 5: estudiantes <- 0
+        setEstudiantes(0)
+    setSeats(Array(12).fill(false));
         setSimStep(1);
         break;
       case 1:
@@ -76,10 +76,11 @@ export const ArticleCiclosIntroduccion: React.FC = () => {
         break;
       case 2:
         // increment count: estudiantes <- estudiantes + 1 & add student to seat
-        setActiveLine(7); // line 7: estudiantes <- estudiantes + 1
+        setActiveLine(7)
+    // line 7: estudiantes <- estudiantes + 1
         
-        const nextEstudiantes = estudiantes + 1;
-        setEstudiantes(nextEstudiantes);
+        const nextEstudiantes = estudiantes + 1
+    setEstudiantes(nextEstudiantes);
         
         // Fill a seat
         setSeats(prev => {
@@ -230,7 +231,7 @@ export const ArticleCiclosIntroduccion: React.FC = () => {
             {
               tipo: 'Para (For)',
               descripcion: 'Cuando conocemos de antemano el número exacto de repeticiones.',
-              ejemplo: 'Para i <- 1 Hasta 10 Hacer'
+              ejemplo: 'Para i = 1 Hasta 10'
             }
           ]}
         />

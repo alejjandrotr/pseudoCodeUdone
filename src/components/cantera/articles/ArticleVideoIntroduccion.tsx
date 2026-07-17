@@ -48,7 +48,7 @@ export const ArticleVideoIntroduccion: React.FC = () => {
     para: {
       title: "Ciclo Para (For)",
       description: "Es el ciclo determinado. Inicializa la variable contadora, define el límite y establece el incremento o decremento en una única instrucción.",
-      syntax: `Para i <- 1 Hasta limite Hacer\n    // Bloque de código\n    // NO es necesario incrementar i manualmente\nFin Para`,
+      syntax: `Para i = 1 Hasta limite\n    // Bloque de código\n    // NO es necesario incrementar i manualmente\nFin Para`,
       behavior: "Contador integrado | Iteraciones conocidas | Incremento automático.",
       highlight: "Control automatizado"
     }

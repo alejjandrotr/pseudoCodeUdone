@@ -104,9 +104,8 @@ export const ArticleVideoRepetir: React.FC = () => {
     '    Hasta (cantidad_numeros = 0)',
     '    Escribir "La suma total es: " + suma',
     'Fin'
-  ];
-
-  // Auto-play timer
+  ]
+    // Auto-play timer
   useEffect(() => {
     if (isPlaying && !isWaitingInput) {
       intervalRef.current = setInterval(() => {
@@ -152,8 +151,8 @@ export const ArticleVideoRepetir: React.FC = () => {
         setActiveLine(5);
         setSuma(0);
         setRamHighlight('suma');
-        setDebugLogs(prev => [...prev, '> [Línea 5] Memoria: inicializando suma <- 0']);
-        setSimStep(1);
+        setDebugLogs(prev => [...prev, '> [Línea 5] Memoria: inicializando suma <- 0'])
+    setSimStep(1);
         break;
       case 1:
         // Write prompt & Leer quantity of numbers (Lines 6 & 7)
@@ -191,8 +190,8 @@ export const ArticleVideoRepetir: React.FC = () => {
         const newSuma = state.suma + (state.currentNumber ?? 0);
         setSuma(newSuma);
         setRamHighlight('suma');
-        setDebugLogs(prev => [...prev, `> [Línea 11] Acumulador: suma <- ${prevSuma} + ${state.currentNumber} ➔ ${newSuma}`]);
-        setSimStep(5);
+        setDebugLogs(prev => [...prev, `> [Línea 11] Acumulador: suma <- ${prevSuma} + ${state.currentNumber} ➔ ${newSuma}`])
+    setSimStep(5);
         break;
       case 5:
         // Decrement (Line 12)
@@ -200,8 +199,8 @@ export const ArticleVideoRepetir: React.FC = () => {
         const nextIteration = state.iteration + 1;
         setIteration(nextIteration);
         setRamHighlight('cantidad');
-        setDebugLogs(prev => [...prev, `> [Línea 12] Decremento: cantidad_numeros <- ${state.cantidadNumeros - state.iteration} - 1 ➔ ${state.cantidadNumeros - nextIteration}`]);
-        setSimStep(6);
+        setDebugLogs(prev => [...prev, `> [Línea 12] Decremento: cantidad_numeros <- ${state.cantidadNumeros - state.iteration} - 1 ➔ ${state.cantidadNumeros - nextIteration}`])
+    setSimStep(6);
         break;
       case 6:
         // Evaluate Hasta condition (Line 13)

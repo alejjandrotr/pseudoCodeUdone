@@ -147,7 +147,11 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
       'Variables:',
       '    numero, cont_procesados, cont_positivos, cont_negativos, cont_pares, cont_impares: Entero',
       'Inicio',
-      '    cont_procesados <- 0; cont_positivos <- 0; cont_negativos <- 0; cont_pares <- 0; cont_impares <- 0',
+      '    cont_procesados <- 0',
+      '    cont_positivos <- 0',
+      '    cont_negativos <- 0',
+      '    cont_pares <- 0',
+      '    cont_impares <- 0',
       '    Escribir "Indique el número a procesar (Ingrese 0 para salir): "',
       '    Leer numero',
       '    Mientras (numero <> 0) Hacer',
@@ -172,7 +176,9 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
       '    Leer p',
       '    Escribir "Indique el divisor (S): "',
       '    Leer s',
-      '    dividendo <- p; divisor <- s; cont_divisiones <- 0',
+      '    dividendo <- p',
+      '    divisor <- s',
+      '    cont_divisiones <- 0',
       '    Mientras (dividendo >= divisor) Hacer',
       '        dividendo <- dividendo - divisor',
       '        cont_divisiones <- cont_divisiones + 1',
@@ -185,14 +191,29 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
     [
       'Algoritmo calculo_de_notas',
       'Variables:',
-      '    nota, nota_final: Real; i, cont_aprobados, cont_reprobados, cont_reparacion: Entero; continuar: Caracter',
+      '    nota, nota_final: Real',
+      '    i, cont_aprobados, cont_reprobados, cont_reparacion: Entero; continuar: Caracter',
       'Inicio',
-      '    cont_aprobados <- 0; cont_reprobados <- 0; cont_reparacion <- 0',
+      '    cont_aprobados <- 0',
+      '    cont_reprobados <- 0',
+      '    cont_reparacion <- 0',
       '    Repetir',
       '        nota_final <- 0',
-      '        Para i <- 1 Hasta 3 Hacer Escribir "Examen ", i; Leer nota; nota_final <- nota_final + (nota * 0.166) Fin Para',
-      '        Para i <- 1 Hasta 3 Hacer Escribir "Proyecto ", i; Leer nota; nota_final <- nota_final + (nota * 0.066) Fin Para',
-      '        Para i <- 1 Hasta 1 Hacer Escribir "Trabajo ", i; Leer nota; nota_final <- nota_final + (nota * 0.3) Fin Para',
+      '        Para i = 1 Hasta 3',
+      '            Escribir "Examen ", i',
+      '            Leer nota',
+      '            nota_final <- nota_final + (nota * 0.166)',
+      '        Fin Para',
+      '        Para i = 1 Hasta 3',
+      '            Escribir "Proyecto ", i',
+      '            Leer nota',
+      '            nota_final <- nota_final + (nota * 0.066)',
+      '        Fin Para',
+      '        Para i = 1 Hasta 1',
+      '            Escribir "Trabajo ", i',
+      '            Leer nota',
+      '            nota_final <- nota_final + (nota * 0.3)',
+      '        Fin Para',
       '        Escribir "La nota definitiva es: ", nota_final',
       '        Si (nota_final >= 4.5) Entonces cont_aprobados <- cont_aprobados + 1',
       '        SiNo cont_reprobados <- cont_reprobados + 1',
@@ -230,14 +251,13 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
       '    Escribir "Indique el límite superior: "',
       '    Leer numero2',
       '    Escribir "Imprimiendo números pares en el rango:"',
-      '    Para i <- numero1 Hasta numero2 Hacer',
+      '    Para i = numero1 Hasta numero2',
       '        Si (i MOD 2 = 0) Entonces Escribir i Fin Si',
       '    Fin Para',
       'Fin'
     ]
-  ];
-
-  // Auto-play timer
+  ]
+    // Auto-play timer
   useEffect(() => {
     if (isPlaying && !isWaitingInput) {
       intervalRef.current = setInterval(() => {
@@ -383,8 +403,8 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
           setDividendo(state.p);
           setDivisor(state.s);
           setCDivisiones(0);
-          setDebugLogs(prev => [...prev, `> [Línea 9] Asignación: dividendo <- ${state.p}, divisor <- ${state.s}, cont_divisiones <- 0`]);
-          setSimStep(3);
+          setDebugLogs(prev => [...prev, `> [Línea 9] Asignación: dividendo <- ${state.p}, divisor <- ${state.s}, cont_divisiones <- 0`])
+    setSimStep(3);
           break;
         case 3:
           setActiveLine(10);
@@ -404,8 +424,8 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
           const nextCount = state.cDivisiones + 1;
           setDividendo(nextDiv);
           setCDivisiones(nextCount);
-          setDebugLogs(prev => [...prev, `> [Línea 11] Resta: dividendo <- ${nextDiv}, cont_divisiones <- ${nextCount}`]);
-          setSimStep(3); // loop back
+          setDebugLogs(prev => [...prev, `> [Línea 11] Resta: dividendo <- ${nextDiv}, cont_divisiones <- ${nextCount}`])
+    setSimStep(3); // loop back
           break;
         case 5:
           setActiveLine(14);
@@ -447,8 +467,8 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
           setActiveLine(7);
           setNotaFinal(0);
           setExamIdx(1);
-          setDebugLogs(prev => [...prev, '> [Línea 7] Reiniciar nota_final <- 0 para este alumno']);
-          setSimStep(3);
+          setDebugLogs(prev => [...prev, '> [Línea 7] Reiniciar nota_final <- 0 para este alumno'])
+    setSimStep(3);
           break;
         case 3:
           // Exams Para Loop (Line 8)
@@ -557,8 +577,8 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
         case 0:
           setActiveLine(5);
           setFactorialAns(1);
-          setDebugLogs(prev => [...prev, '> [Línea 5] Inicializar acumulador respuesta <- 1']);
-          setSimStep(1);
+          setDebugLogs(prev => [...prev, '> [Línea 5] Inicializar acumulador respuesta <- 1'])
+    setSimStep(1);
           break;
         case 1:
           setActiveLine(6);
@@ -582,15 +602,15 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
           setActiveLine(9);
           const newAns = state.factorialAns * (state.factorialN ?? 1);
           setFactorialAns(newAns);
-          setDebugLogs(prev => [...prev, `> [Línea 9] Multiplicación: respuesta <- ${state.factorialAns} * ${state.factorialN} ➔ ${newAns}`]);
-          setSimStep(4);
+          setDebugLogs(prev => [...prev, `> [Línea 9] Multiplicación: respuesta <- ${state.factorialAns} * ${state.factorialN} ➔ ${newAns}`])
+    setSimStep(4);
           break;
         case 4:
           setActiveLine(10);
           const nextN = (state.factorialN ?? 1) - 1;
           setFactorialN(nextN);
-          setDebugLogs(prev => [...prev, `> [Línea 10] Decremento: n <- ${state.factorialN} - 1 ➔ ${nextN}`]);
-          setSimStep(2); // loop back
+          setDebugLogs(prev => [...prev, `> [Línea 10] Decremento: n <- ${state.factorialN} - 1 ➔ ${nextN}`])
+    setSimStep(2); // loop back
           break;
         case 5:
           setActiveLine(12);
@@ -629,8 +649,8 @@ export const ArticleEjerciciosResueltos: React.FC = () => {
           setActiveLine(9);
           setTerminalLogs(prev => [...prev, 'Imprimiendo números pares en el rango:']);
           setI(state.paresN1);
-          setDebugLogs(prev => [...prev, `> [Línea 9] Inicializando variable contadora i <- ${state.paresN1}`]);
-          setSimStep(3);
+          setDebugLogs(prev => [...prev, `> [Línea 9] Inicializando variable contadora i <- ${state.paresN1}`])
+    setSimStep(3);
           break;
         case 3:
           setActiveLine(10);
