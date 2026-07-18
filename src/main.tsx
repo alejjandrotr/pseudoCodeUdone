@@ -8,6 +8,8 @@ import { ChangePasswordPage } from './pages/auth/ChangePasswordPage'
 import { StudentDashboardPage } from './pages/student/StudentDashboardPage'
 import { ProjectDeliveryPage } from './pages/student/ProjectDeliveryPage'
 import { ProjectDetailPage } from './pages/student/ProjectDetailPage'
+import { ExamDashboardRouted } from './pages/ExamDashboardRouted'
+import { VirtualExamRouted } from './pages/VirtualExamRouted'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -19,6 +21,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/dashboard" element={<StudentDashboardPage />} />
         <Route path="/proyecto/:projectId" element={<ProjectDetailPage />} />
         <Route path="/entregar/:projectId" element={<ProjectDeliveryPage />} />
+        <Route path="/parcial-virtual" element={<ExamDashboardRouted />} />
+        <Route path="/parcial-virtual/examen" element={<VirtualExamRouted />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

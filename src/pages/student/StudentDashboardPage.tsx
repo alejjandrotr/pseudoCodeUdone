@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { motion } from 'framer-motion';
-import { LogOut, User as UserIcon, FileText, CheckCircle, Clock } from 'lucide-react';
+import { LogOut, User as UserIcon, FileText, CheckCircle, Clock, ShieldAlert, Code, ArrowRight } from 'lucide-react';
 
 interface Project {
   id: number;
@@ -22,6 +22,7 @@ export const StudentDashboardPage: React.FC = () => {
   const [student, setStudent] = useState<any>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [examMaxScore, setExamMaxScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -81,6 +82,19 @@ export const StudentDashboardPage: React.FC = () => {
         
         if (delError) throw delError;
         setDeliveries(deliveriesData || []);
+      }
+
+      // Fetch exam max score
+      const { data: examData } = await supabase
+        .from('exam_sessions')
+        .select('final_score')
+        .eq('student_ci', cedula);
+
+      if (examData && examData.length > 0) {
+        const scores = examData.map(s => s.final_score).filter(s => s !== null);
+        if (scores.length > 0) {
+          setExamMaxScore(Math.max(...scores));
+        }
       }
 
     } catch (error) {
@@ -194,6 +208,56 @@ export const StudentDashboardPage: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Sección: Parcial Virtual de Código */}
+        <h2 className="text-2xl font-bold text-white mb-6 mt-12 flex items-center gap-3">
+          <ShieldAlert className="w-6 h-6 text-emerald-400" />
+          Evaluaciones Virtuales
+        </h2>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/20 border border-emerald-500/20 rounded-xl p-6 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none"></div>
+          
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                <Code className="w-7 h-7 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Parcial Virtual de Código</h3>
+                <p className="text-sm text-slate-400 max-w-md">
+                  Resuelve 4 ejercicios de programación en TypeScript. Tienes 1 hora y puedes intentarlo múltiples veces. Solo se conservará tu mejor nota.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Tu Mejor Nota</p>
+                <p className="text-3xl font-black text-white">
+                  {examMaxScore !== null ? (
+                    <><span className="text-emerald-400">{examMaxScore.toFixed(0)}</span><span className="text-lg text-slate-500">/20</span></>
+                  ) : (
+                    <><span className="text-slate-600">--</span><span className="text-lg text-slate-600">/20</span></>
+                  )}
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/parcial-virtual')}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-lg font-bold transition-all hover:shadow-lg hover:shadow-emerald-500/20 flex items-center gap-2"
+              >
+                Presentar Parcial
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
       </main>
     </div>
   );
