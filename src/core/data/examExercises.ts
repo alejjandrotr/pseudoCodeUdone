@@ -358,5 +358,197 @@ export const EXAM_EXERCISES: Exercise[] = [
     privateTests: [
       { input: "1\nM\n", expected_output: "0" }
     ]
+  },
+  {
+    id: '21',
+    title: 'El Lenguaje de Yoda',
+    level: 'easy',
+    premise: 'El Maestro Yoda tiene una forma peculiar de hablar. Dada una cadena que representa una oración simple (palabras separadas por un solo espacio), devuelve una nueva cadena con el orden de las palabras invertido.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\n#include <string>\nusing namespace std;\n// ----------------------\n\nstring hablar_como_yoda(string frase) {\n    // Escribe tu código aquí\n    return "";\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    string frase;\n    getline(cin, frase);\n    cout << hablar_como_yoda(frase) << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Devuelve la frase con las palabras en orden invertido.\n// ----------------------\n\nfunction hablar_como_yoda(frase: string): string {\n    // Escribe tu código aquí\n    return "";\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const input = (globalThis as any).__INPUT__.trim();\n    console.log(hablar_como_yoda(input));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16],
+    publicTests: [
+      { input: "que la fuerza te acompañe\n", expected_output: "acompañe te fuerza la que" },
+      { input: "yo soy tu padre\n", expected_output: "padre tu soy yo" },
+      { input: "hola\n", expected_output: "hola" }
+    ],
+    privateTests: [
+      { input: "aprender debes mucho todavía\n", expected_output: "todavía mucho debes aprender" },
+      { input: "el camino así es\n", expected_output: "es así camino el" }
+    ]
+  },
+  {
+    id: '22',
+    title: 'Las Deudas de Han Solo',
+    level: 'easy',
+    premise: 'Han Solo tiene un registro de sus transacciones recientes en un arreglo de enteros. Los números positivos son ganancias y los negativos son deudas a Jabba el Hutt. Suma y devuelve únicamente el total de los valores negativos (el resultado debe ser un número negativo o 0).',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\nusing namespace std;\n// ----------------------\n\nint calcular_deuda(int n, int transacciones[]) {\n    // Escribe tu código aquí\n    return 0;\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    int arr[100];\n    for(int i=0; i<n; i++) cin >> arr[i];\n    cout << calcular_deuda(n, arr) << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes un arreglo de enteros (transacciones). Suma las deudas (valores negativos).\n// ----------------------\n\nfunction calcular_deuda(transacciones: number[]): number {\n    // Escribe tu código aquí\n    return 0;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 1 || tokens[0] === "") {\n        console.log(0);\n        return;\n    }\n    const arr = tokens.slice(1).map(Number);\n    console.log(calcular_deuda(arr));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['cpp', 'typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17,18],
+    publicTests: [
+      { input: "4\n10 -5 20 -15\n", expected_output: "-20" },
+      { input: "3\n100 50 0\n", expected_output: "0" },
+      { input: "5\n-1 -2 -3 -4 -5\n", expected_output: "-15" }
+    ],
+    privateTests: [
+      { input: "1\n-100\n", expected_output: "-100" },
+      { input: "0\n\n", expected_output: "0" }
+    ]
+  },
+  {
+    id: '23',
+    title: 'Calibración del Sable de Luz',
+    level: 'easy',
+    premise: 'Para que un cristal kyber funcione, su número de serie no debe tener imperfecciones. Recibes una cadena con el número de serie. Debes devolver la misma cadena pero eliminando todos los espacios en blanco y convirtiendo todas las letras a mayúsculas.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\n#include <string>\nusing namespace std;\n// ----------------------\n\nstring calibrar_cristal(string serie) {\n    // Escribe tu código aquí\n    return "";\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    string serie;\n    getline(cin, serie);\n    cout << calibrar_cristal(serie) << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Limpia la cadena eliminando espacios y pasando a mayúsculas.\n// ----------------------\n\nfunction calibrar_cristal(serie: string): string {\n    // Escribe tu código aquí\n    return "";\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const input = (globalThis as any).__INPUT__.trim();\n    console.log(calibrar_cristal(input));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17],
+    publicTests: [
+      { input: "ky b E r 1 2\n", expected_output: "KYBER12" },
+      { input: "  sith  \n", expected_output: "SITH" },
+      { input: "ABC\n", expected_output: "ABC" }
+    ],
+    privateTests: [
+      { input: " x y z \n", expected_output: "XYZ" },
+      { input: "  \n", expected_output: "" }
+    ]
+  },
+  {
+    id: '24',
+    title: 'Salto al Hiperespacio',
+    level: 'intermediate',
+    premise: 'Para que el Halcón Milenario salte al hiperespacio sin chocar con una estrella, las coordenadas de navegación deben ser estrictamente crecientes. Recibes un arreglo de enteros. Devuelve True si cada número es mayor al anterior, o False en caso contrario.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\nusing namespace std;\n// ----------------------\n\nbool salto_seguro(int n, int coordenadas[]) {\n    // Escribe tu código aquí\n    return false;\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    int arr[100];\n    for(int i=0; i<n; i++) cin >> arr[i];\n    cout << (salto_seguro(n, arr) ? "True" : "False") << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes un arreglo de enteros. Devuelve True si es estrictamente creciente, o False si no.\n// ----------------------\n\nfunction salto_seguro(coordenadas: number[]): boolean {\n    // Escribe tu código aquí\n    return false;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 1 || tokens[0] === "") {\n        console.log("True");\n        return;\n    }\n    const arr = tokens.slice(1).map(Number);\n    console.log(salto_seguro(arr) ? "True" : "False");\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['cpp', 'typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17,18],
+    publicTests: [
+      { input: "4\n1 3 5 8\n", expected_output: "True" },
+      { input: "4\n1 3 3 8\n", expected_output: "False" },
+      { input: "3\n10 5 20\n", expected_output: "False" }
+    ],
+    privateTests: [
+      { input: "1\n100\n", expected_output: "True" },
+      { input: "2\n10 20\n", expected_output: "True" },
+      { input: "2\n20 10\n", expected_output: "False" }
+    ]
+  },
+  {
+    id: '25',
+    title: 'Radar Rebelde',
+    level: 'intermediate',
+    premise: 'La base de Hoth tiene un radar representado por una matriz NxM de cadenas. Debes contar cuántas naves enemigas hay en el sector. Devuelve el número de veces que aparece exactamente la cadena "TIE" en toda la matriz.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\n#include <string>\nusing namespace std;\n// ----------------------\n\nint contar_cazas_imperiales(int n, int m, string radar[20][20]) {\n    // Escribe tu código aquí\n    return 0;\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n, m;\n    if (!(cin >> n >> m)) return 0;\n    string radar[20][20];\n    for(int i=0; i<n; i++) {\n        for(int j=0; j<m; j++) {\n            cin >> radar[i][j];\n        }\n    }\n    cout << contar_cazas_imperiales(n, m, radar) << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes una matriz de cadenas NxM. Cuenta cuántas veces aparece exactamente "TIE".\n// ----------------------\n\nfunction contar_cazas_imperiales(radar: string[][]): number {\n    // Escribe tu código aquí\n    return 0;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 2) return;\n    const n = Number(tokens[0]);\n    const m = Number(tokens[1]);\n    const radar: string[][] = [];\n    let idx = 2;\n    for(let i=0; i<n; i++){\n        const row = [];\n        for(let j=0; j<m; j++){\n            row.push(tokens[idx++]);\n        }\n        radar.push(row);\n    }\n    console.log(contar_cazas_imperiales(radar));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],
+    publicTests: [
+      { input: "2 3\nX-Wing TIE Y-Wing\nTIE Star-Destroyer TIE\n", expected_output: "3" },
+      { input: "2 2\nFalcon Falcon\nFalcon Falcon\n", expected_output: "0" },
+      { input: "1 1\nTIE\n", expected_output: "1" }
+    ],
+    privateTests: [
+      { input: "3 2\nTIE tie\nTie TIE\nTIE TIE\n", expected_output: "4" },
+      { input: "2 2\nTI E TIE_fighter\n_TIE TIE\n", expected_output: "1" }
+    ]
+  },
+  {
+    id: '26',
+    title: 'Escudos Deflectores',
+    level: 'intermediate',
+    premise: 'La energía de los escudos de una nave es una matriz cuadrada NxN de enteros. El piloto te pide verificar una sección específica. Recibes la matriz y un número entero fila. Devuelve la suma de todos los valores que se encuentran únicamente en esa fila (recuerda que los índices comienzan en 0).',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\nusing namespace std;\n// ----------------------\n\nint energia_seccion(int n, int escudos[20][20], int fila) {\n    // Escribe tu código aquí\n    return 0;\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n, fila;\n    if (!(cin >> n >> fila)) return 0;\n    int escudos[20][20];\n    for(int i=0; i<n; i++) {\n        for(int j=0; j<n; j++) {\n            cin >> escudos[i][j];\n        }\n    }\n    cout << energia_seccion(n, escudos, fila) << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes la matriz cuadrada NxN y la fila a sumar.\n// ----------------------\n\nfunction energia_seccion(escudos: number[][], fila: number): number {\n    // Escribe tu código aquí\n    return 0;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 2) return;\n    const n = Number(tokens[0]);\n    const fila = Number(tokens[1]);\n    const escudos: number[][] = [];\n    let idx = 2;\n    for(let i=0; i<n; i++){\n        const row = [];\n        for(let j=0; j<n; j++){\n            row.push(Number(tokens[idx++]));\n        }\n        escudos.push(row);\n    }\n    console.log(energia_seccion(escudos, fila));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],
+    publicTests: [
+      { input: "3 1\n10 20 30\n40 50 60\n70 80 90\n", expected_output: "150" },
+      { input: "2 0\n5 5\n10 10\n", expected_output: "10" },
+      { input: "3 2\n1 2 3\n4 5 6\n7 8 9\n", expected_output: "24" }
+    ],
+    privateTests: [
+      { input: "1 0\n99\n", expected_output: "99" },
+      { input: "2 1\n1 2\n3 4\n", expected_output: "7" }
+    ]
+  },
+  {
+    id: '27',
+    title: 'Droide Astromecánico',
+    level: 'intermediate',
+    premise: 'BB-8 está recibiendo una transmisión codificada. Necesitas saber si es de la Resistencia. Devuelve True si la cadena contiene la misma cantidad de letras "R" (mayúsculas o minúsculas) que de letras "B" (mayúsculas o minúsculas).',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\n#include <string>\nusing namespace std;\n// ----------------------\n\nbool verificar_transmision(string mensaje) {\n    // Escribe tu código aquí\n    return false;\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    string mensaje;\n    getline(cin, mensaje);\n    cout << (verificar_transmision(mensaje) ? "True" : "False") << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Devuelve True si el mensaje tiene la misma cantidad de Rs que de Bs (case-insensitive).\n// ----------------------\n\nfunction verificar_transmision(mensaje: string): boolean {\n    // Escribe tu código aquí\n    return false;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const input = (globalThis as any).__INPUT__.trim();\n    console.log(verificar_transmision(input) ? "True" : "False");\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17],
+    publicTests: [
+      { input: "R2D2-B9\n", expected_output: "True" },
+      { input: "RRbb\n", expected_output: "True" },
+      { input: "R2-D2\n", expected_output: "False" }
+    ],
+    privateTests: [
+      { input: "BB-8 Resistance\n", expected_output: "False" },
+      { input: "R-B\n", expected_output: "True" },
+      { input: "rRbB\n", expected_output: "True" },
+      { input: "Ninguna de las dos letras\n", expected_output: "True" },
+      { input: "r\n", expected_output: "False" }
+    ]
+  },
+  {
+    id: '28',
+    title: 'Impacto de Torpedo de Protones',
+    level: 'hard',
+    premise: 'Un torpedo impacta en la Estrella de la Muerte. Recibes una matriz NxM de enteros (todos inicializados en 1, que significa "intacto") y las coordenadas del impacto (fila, columna). Debes cambiar a 0 ("destruido") la celda del impacto y sus vecinas inmediatas arriba, abajo, izquierda y derecha. Devuelve la matriz modificada, asegurándote de no salirte de los límites del arreglo.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\nusing namespace std;\n// ----------------------\n\nvoid impacto_torpedo(int n, int m, int superficie[20][20], int fila, int columna) {\n    // Escribe tu código aquí\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n, m, f, c;\n    if (!(cin >> n >> m >> f >> c)) return 0;\n    int superficie[20][20];\n    for(int i=0; i<n; i++) {\n        for(int j=0; j<m; j++) {\n            cin >> superficie[i][j];\n        }\n    }\n    impacto_torpedo(n, m, superficie, f, c);\n    for(int i=0; i<n; i++) {\n        for(int j=0; j<m; j++) {\n            cout << superficie[i][j] << (j == m-1 ? "" : " ");\n        }\n        cout << endl;\n    }\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes y modificas la matriz. Devuelve la matriz modificada.\n// ----------------------\n\nfunction impacto_torpedo(superficie: number[][], fila: number, columna: number): number[][] {\n    // Escribe tu código aquí\n    return superficie;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 4) return;\n    const n = Number(tokens[0]);\n    const m = Number(tokens[1]);\n    const fila = Number(tokens[2]);\n    const columna = Number(tokens[3]);\n    const superficie: number[][] = [];\n    let idx = 4;\n    for(let i=0; i<n; i++){\n        const row = [];\n        for(let j=0; j<m; j++){\n            row.push(Number(tokens[idx++]));\n        }\n        superficie.push(row);\n    }\n    const res = impacto_torpedo(superficie, fila, columna);\n    res.forEach(row => console.log(row.join(" ")));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+    publicTests: [
+      { input: "3 3 1 1\n1 1 1\n1 1 1\n1 1 1\n", expected_output: "1 0 1\n0 0 0\n1 0 1" },
+      { input: "3 3 0 0\n1 1 1\n1 1 1\n1 1 1\n", expected_output: "0 0 1\n0 1 1\n1 1 1" },
+      { input: "2 2 1 0\n1 1\n1 1\n", expected_output: "0 1\n0 0" }
+    ],
+    privateTests: [
+      { input: "1 3 0 1\n1 1 1\n", expected_output: "0 0 0" },
+      { input: "4 4 3 3\n1 1 1 1\n1 1 1 1\n1 1 1 1\n1 1 1 1\n", expected_output: "1 1 1 1\n1 1 1 1\n1 1 1 0\n1 1 0 0" }
+    ]
+  },
+  {
+    id: '29',
+    title: 'La Ruta de Kessel',
+    level: 'hard',
+    premise: 'Para encontrar la ruta más rápida, el computador de navegación divide el espacio en sectores (una matriz NxM de enteros, donde cada número es el tiempo en parsecs). Debes encontrar el valor mínimo de cada fila y devolver un arreglo unidimensional con esos valores en orden.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\nusing namespace std;\n// ----------------------\n\nvoid ruta_mas_corta(int n, int m, int sectores[20][20], int res[]) {\n    // Escribe tu código aquí\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n, m;\n    if (!(cin >> n >> m)) return 0;\n    int sectores[20][20];\n    for(int i=0; i<n; i++) {\n        for(int j=0; j<m; j++) {\n            cin >> sectores[i][j];\n        }\n    }\n    int res[20];\n    ruta_mas_corta(n, m, sectores, res);\n    for(int i=0; i<n; i++) {\n        cout << res[i] << (i == n-1 ? "" : " ");\n    }\n    cout << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes la matriz sectores NxM. Devuelve un arreglo con el valor mínimo de cada fila.\n// ----------------------\n\nfunction ruta_mas_corta(sectores: number[][]): number[] {\n    // Escribe tu código aquí\n    return [];\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 2) return;\n    const n = Number(tokens[0]);\n    const m = Number(tokens[1]);\n    const sectores: number[][] = [];\n    let idx = 2;\n    for(let i=0; i<n; i++){\n        const row = [];\n        for(let j=0; j<m; j++){\n            row.push(Number(tokens[idx++]));\n        }\n        sectores.push(row);\n    }\n    console.log(ruta_mas_corta(sectores).join(" "));\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],
+    publicTests: [
+      { input: "3 3\n10 20 30\n5 15 25\n100 2 80\n", expected_output: "10 5 2" },
+      { input: "2 4\n1 2 3 4\n-1 -2 -3 -4\n", expected_output: "1 -4" }
+    ],
+    privateTests: [
+      { input: "1 3\n9 9 9\n", expected_output: "9" },
+      { input: "3 1\n10\n20\n30\n", expected_output: "10 20 30" }
+    ]
+  },
+  {
+    id: '30',
+    title: 'Holograma Imperial',
+    level: 'hard',
+    premise: 'Los códigos de acceso del Imperio siempre forman matrices perfectamente simétricas. Dada una matriz cuadrada NxN, verifica si es simétrica respecto a su diagonal principal (es decir, si el elemento en [i][j] es exactamente igual al elemento en [j][i] para todas las posiciones). Devuelve True si lo es, o False en caso contrario.',
+    boilerplate: '// --- ZONA PROTEGIDA ---\n#include <iostream>\nusing namespace std;\n// ----------------------\n\nbool es_simetrica(int n, int matriz[20][20]) {\n    // Escribe tu código aquí\n    return false;\n}\n\n// --- ZONA PROTEGIDA ---\nint main() {\n    int n;\n    if (!(cin >> n)) return 0;\n    int matriz[20][20];\n    for(int i=0; i<n; i++) {\n        for(int j=0; j<n; j++) {\n            cin >> matriz[i][j];\n        }\n    }\n    cout << (es_simetrica(n, matriz) ? "True" : "False") << endl;\n    return 0;\n}\n// ----------------------',
+    boilerplate_ts: '// --- ZONA PROTEGIDA ---\n// TypeScript: Recibes una matriz cuadrada NxN. Devuelve True si es simétrica, o False en caso contrario.\n// ----------------------\n\nfunction es_simetrica(matriz: number[][]): boolean {\n    // Escribe tu código aquí\n    return false;\n}\n\n// --- ZONA PROTEGIDA ---\nfunction main() {\n    const tokens = (globalThis as any).__INPUT__.trim().split(/\\s+/);\n    if(tokens.length < 1 || tokens[0] === "") return;\n    const n = Number(tokens[0]);\n    const matriz: number[][] = [];\n    let idx = 1;\n    for(let i=0; i<n; i++){\n        const row = [];\n        for(let j=0; j<n; j++){\n            row.push(Number(tokens[idx++]));\n        }\n        matriz.push(row);\n    }\n    console.log(es_simetrica(matriz) ? "True" : "False");\n}\nmain();\n// ----------------------',
+    allowedLanguages: ['typescript'],
+    readOnlyLines: [1,2,3,4,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],
+    publicTests: [
+      { input: "3\n1 2 3\n2 4 5\n3 5 6\n", expected_output: "True" },
+      { input: "3\n1 2 3\n2 4 5\n3 9 6\n", expected_output: "False" }
+    ],
+    privateTests: [
+      { input: "1\n100\n", expected_output: "True" },
+      { input: "2\n1 2\n3 4\n", expected_output: "False" }
+    ]
   }
 ];
