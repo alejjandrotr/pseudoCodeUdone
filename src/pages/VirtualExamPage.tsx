@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, AlertTriangle, Save, Check, Play, TerminalSquare, ArrowLeft, HelpCircle, X } from 'lucide-react';
+import { Clock, AlertTriangle, Save, Check, Play, TerminalSquare, ArrowLeft, HelpCircle, X, Download, FileText } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { SecureCodeEditor } from '../components/evaluator/SecureCodeEditor';
 import { supabase } from '../lib/supabase';
@@ -20,70 +20,147 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
   const [currentExIndex, setCurrentExIndex] = useState(0);
   const [copyPasteCount, setCopyPasteCount] = useState(0);
   const [studentCi, setStudentCi] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string>('');
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [submitProgress, setSubmitProgress] = useState<number | null>(null);
   const [finalScoreInfo, setFinalScoreInfo] = useState<{ score: number, isHighScore: boolean } | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate();
-  
+
+  const endTimeRef = useRef<number | null>(null);
+  const isSubmittingRef = useRef<boolean>(false);
+
   useEffect(() => {
-    // Autenticación
-    const checkAuth = async () => {
+    // Autenticación e inicialización / restauración de sesión
+    const initSession = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         alert("Debes iniciar sesión para presentar el parcial.");
         navigate('/login-estudiantes');
         return;
       }
-      setStudentCi(user.email?.split('@')[0] || "Desconocido");
-    };
-    checkAuth();
+      const ci = user.email?.split('@')[0] || "Desconocido";
+      setStudentCi(ci);
 
-    // Seleccionar 4 ejercicios al azar según la probabilidad:
-    // - Siempre 1 difícil (Avanzado)
-    // - 50% probabilidad de: 1 fácil (Básico) + 2 intermedios
-    // - 50% probabilidad de: 3 intermedios (sin repetir)
-    const easies = EXAM_EXERCISES.filter(e => e.level === 'easy');
-    const intermediates = EXAM_EXERCISES.filter(e => e.level === 'intermediate');
-    const hards = EXAM_EXERCISES.filter(e => e.level === 'hard');
-    
-    const randomHard = hards[Math.floor(Math.random() * hards.length)];
-    const hasEasy = Math.random() < 0.5;
-    
-    let selected: Exercise[] = [];
-    if (hasEasy && easies.length > 0) {
-      const randomEasy = easies[Math.floor(Math.random() * easies.length)];
-      const shuffledInter = [...intermediates].sort(() => 0.5 - Math.random());
-      selected = [randomEasy, shuffledInter[0], shuffledInter[1], randomHard];
-    } else {
-      const shuffledInter = [...intermediates].sort(() => 0.5 - Math.random());
-      selected = [shuffledInter[0], shuffledInter[1], shuffledInter[2] || shuffledInter[0], randomHard];
+      const storageKey = `active_exam_session_${ci}`;
+      const savedSessionRaw = localStorage.getItem(storageKey);
+
+      if (savedSessionRaw) {
+        try {
+          const savedSession = JSON.parse(savedSessionRaw);
+          const now = Date.now();
+          const remaining = Math.max(0, Math.floor((savedSession.endTime - now) / 1000));
+
+          setExercises(savedSession.exercises);
+          setCodes(savedSession.codes);
+          setLanguages(savedSession.languages);
+          setCopyPasteCount(savedSession.copyPasteCount || 0);
+          setSessionId(savedSession.sessionId || crypto.randomUUID());
+          endTimeRef.current = savedSession.endTime;
+          setTimeLeft(remaining);
+
+          if (remaining <= 0) {
+            // El tiempo expiró mientras el estudiante estuvo fuera
+            setTimeout(() => {
+              handleSubmit(savedSession.exercises, savedSession.codes, savedSession.languages, savedSession.copyPasteCount || 0, ci);
+            }, 500);
+          }
+          return;
+        } catch (e) {
+          console.error("Error al cargar la sesión guardada del examen:", e);
+        }
+      }
+
+      // Si no hay sesión activa previa, crear un intento nuevo
+      const easies = EXAM_EXERCISES.filter(e => e.level === 'easy');
+      const intermediates = EXAM_EXERCISES.filter(e => e.level === 'intermediate');
+      const hards = EXAM_EXERCISES.filter(e => e.level === 'hard');
+      
+      const randomHard = hards[Math.floor(Math.random() * hards.length)];
+      const hasEasy = Math.random() < 0.5;
+      
+      let selected: Exercise[] = [];
+      if (hasEasy && easies.length > 0) {
+        const randomEasy = easies[Math.floor(Math.random() * easies.length)];
+        const shuffledInter = [...intermediates].sort(() => 0.5 - Math.random());
+        selected = [randomEasy, shuffledInter[0], shuffledInter[1], randomHard];
+      } else {
+        const shuffledInter = [...intermediates].sort(() => 0.5 - Math.random());
+        selected = [shuffledInter[0], shuffledInter[1], shuffledInter[2] || shuffledInter[0], randomHard];
+      }
+      
+      const initialLangs = selected.map(e => e.allowedLanguages[0]);
+      const initialCodes = selected.map((e, i) => initialLangs[i] === 'cpp' ? e.boilerplate : (e.boilerplate_ts || e.boilerplate));
+      const newSessionId = crypto.randomUUID();
+      const endTime = Date.now() + 3600 * 1000; // 1 hora exacta
+
+      setExercises(selected);
+      setLanguages(initialLangs);
+      setCodes(initialCodes);
+      setSessionId(newSessionId);
+      endTimeRef.current = endTime;
+      setTimeLeft(3600);
+
+      // Guardar en localStorage
+      const newSessionData = {
+        sessionId: newSessionId,
+        studentCi: ci,
+        startTime: Date.now(),
+        endTime: endTime,
+        exercises: selected,
+        codes: initialCodes,
+        languages: initialLangs,
+        copyPasteCount: 0
+      };
+      localStorage.setItem(storageKey, JSON.stringify(newSessionData));
+    };
+
+    initSession();
+  }, [navigate]);
+
+  // Guardado en tiempo real en localStorage cuando el estudiante cambia código o lenguaje
+  useEffect(() => {
+    if (!studentCi || exercises.length === 0 || !sessionId) return;
+    const storageKey = `active_exam_session_${studentCi}`;
+    const savedSessionRaw = localStorage.getItem(storageKey);
+    if (savedSessionRaw) {
+      try {
+        const savedSession = JSON.parse(savedSessionRaw);
+        savedSession.codes = codes;
+        savedSession.languages = languages;
+        savedSession.copyPasteCount = copyPasteCount;
+        localStorage.setItem(storageKey, JSON.stringify(savedSession));
+      } catch (e) {
+        console.error("Error actualizando localStorage del examen:", e);
+      }
     }
-    
-    setExercises(selected);
-    const initialLangs = selected.map(e => e.allowedLanguages[0]);
-    setLanguages(initialLangs);
-    setCodes(selected.map((e, i) => initialLangs[i] === 'cpp' ? e.boilerplate : (e.boilerplate_ts || e.boilerplate)));
-  }, []);
+  }, [codes, languages, copyPasteCount, studentCi, exercises, sessionId]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [showTSGuideModal, setShowTSGuideModal] = useState(false);
   const [consoleResults, setConsoleResults] = useState<Record<number, any>>({});
   const [activeTab, setActiveTab] = useState<'statement' | 'console'>('statement');
 
+  // Temporizador preciso basado en endTimeRef
   useEffect(() => {
+    if (!endTimeRef.current || exercises.length === 0) return;
+
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
+      if (!endTimeRef.current) return;
+      const remaining = Math.max(0, Math.floor((endTimeRef.current - Date.now()) / 1000));
+      setTimeLeft(remaining);
+
+      if (remaining <= 0) {
+        clearInterval(timer);
+        if (!isSubmittingRef.current) {
           handleSubmit();
-          return 0;
         }
-        return prev - 1;
-      });
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [exercises]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -133,9 +210,59 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
     }
   };
 
-  const handleSubmit = async () => {
-    if (isSubmitting) return;
+  // Función para generar el reporte Markdown de respaldo de emergencia
+  const generateEmergencyMarkdown = (targetExercises = exercises, targetCodes = codes, targetLangs = languages, targetCopyPastes = copyPasteCount, targetCi = studentCi) => {
+    const ci = targetCi || "Desconocido";
+    const dateStr = new Date().toLocaleString('es-VE');
+    let md = `# RESPALDO DE EMERGENCIA - PARCIAL VIRTUAL\n`;
+    md += `- **Cédula del Estudiante:** ${ci}\n`;
+    md += `- **Fecha y Hora de Generación:** ${dateStr}\n`;
+    md += `- **Intentos de Copiar/Pegar:** ${targetCopyPastes}\n\n`;
+    md += `> ⚠️ **INSTRUCCIONES DE ENVÍO MANUAL:**\n`;
+    md += `> Si presentó inconvenientes de conexión o fallos en el envío automático del parcial,\n`;
+    md += `> envíe este archivo como documento adjunto al correo oficial de la asignatura:\n`;
+    md += `> 📧 **alejjandroclases@gmail.com**\n`;
+    md += `> **Asunto del correo:** Envío Manual Parcial - Cédula ${ci}\n\n`;
+    md += `---\n\n`;
+
+    targetExercises.forEach((ex, i) => {
+      const lang = targetLangs[i] || 'cpp';
+      const code = targetCodes[i] || '';
+      md += `## Ejercicio ${i + 1}: ${ex.title} (Nivel: ${ex.level})\n`;
+      md += `**Enunciado:**\n${ex.premise}\n\n`;
+      md += `**Lenguaje Elegido:** ${lang}\n\n`;
+      md += `**Solución del Estudiante:**\n\`\`\`${lang}\n${code}\n\`\`\`\n\n`;
+      md += `---\n\n`;
+    });
+
+    return md;
+  };
+
+  const handleDownloadEmergencyBackup = () => {
+    const mdContent = generateEmergencyMarkdown();
+    const ci = studentCi || "Estudiante";
+    const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Parcial_Emergencia_${ci}.md`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSubmit = async (
+    overrideExercises = exercises, 
+    overrideCodes = codes, 
+    overrideLangs = languages, 
+    overrideCopyPastes = copyPasteCount,
+    overrideCi = studentCi
+  ) => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
+    setSubmitError(null);
     
     // Crear el Worker dinámicamente
     const worker = new Worker(new URL('../core/workers/codeWorker.ts', import.meta.url), { type: 'module' });
@@ -143,12 +270,13 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
     setSubmitProgress(10);
     
     let totalScore = 0;
-    const maxScorePerExercise = 20 / exercises.length;
-    let markdownReport = `# Reporte de Examen Virtual\n- Cédula: (En desarrollo)\n- Intentos de Copy/Paste: ${copyPasteCount}\n\n`;
+    const maxScorePerExercise = 20 / overrideExercises.length;
+    const ci = overrideCi || "27123456";
+    let markdownReport = `# Reporte de Examen Virtual\n- Cédula: ${ci}\n- Intentos de Copy/Paste: ${overrideCopyPastes}\n\n`;
 
-    for (let i = 0; i < exercises.length; i++) {
-      const ex = exercises[i];
-      const code = codes[i];
+    for (let i = 0; i < overrideExercises.length; i++) {
+      const ex = overrideExercises[i];
+      const code = overrideCodes[i];
       
       markdownReport += `## Ejercicio ${i+1}: ${ex.title}\n`;
       markdownReport += `**Enunciado:** ${ex.premise}\n`;
@@ -157,7 +285,7 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
       const allTests = [...ex.publicTests, ...ex.privateTests];
       const result = await new Promise<any>((resolve) => {
         worker.onmessage = (e) => resolve(e.data);
-        worker.postMessage({ action: 'run_tests', language: languages[i], code, tests: allTests });
+        worker.postMessage({ action: 'run_tests', language: overrideLangs[i], code, tests: allTests });
       });
 
       if (result.success) {
@@ -171,7 +299,7 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
       markdownReport += `### Código Enviado:\n\`\`\`cpp\n${code}\n\`\`\`\n\n`;
       
       // Actualizar progreso por cada ejercicio completado
-      const progress = Math.floor(((i + 1) / exercises.length) * 75) + 10;
+      const progress = Math.floor(((i + 1) / overrideExercises.length) * 75) + 10;
       setSubmitProgress(progress);
     }
     
@@ -179,11 +307,10 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
     setSubmitProgress(90);
 
     // Reemplazar la Nota Previa en el reporte
-    markdownReport = markdownReport.replace('- Cédula: (En desarrollo)', `- Cédula: (Simulada)\n- Nota Previa: ${totalScore.toFixed(2)}/20`);
+    markdownReport = markdownReport.replace(`- Cédula: ${ci}`, `- Cédula: ${ci}\n- Nota Obtenida: ${totalScore.toFixed(2)}/20`);
     
     // Guardar solo si es el mejor intento
     try {
-      const ci = studentCi || "27123456"; 
       const fileName = `${ci}_parcial.md`;
       
       // Obtener intentos previos
@@ -218,7 +345,7 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
           await supabase.from('exam_sessions')
             .update({
               final_score: totalScore,
-              copy_paste_count: copyPasteCount,
+              copy_paste_count: overrideCopyPastes,
               file_url: fileUrl,
               status: 'submitted'
             })
@@ -229,13 +356,16 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
               id: crypto.randomUUID(),
               student_ci: ci,
               status: 'submitted',
-              copy_paste_count: copyPasteCount,
+              copy_paste_count: overrideCopyPastes,
               final_score: totalScore,
               file_url: fileUrl
             }]);
         }
       }
       
+      // Al ser entregado con éxito, eliminar la sesión activa de localStorage
+      localStorage.removeItem(`active_exam_session_${ci}`);
+
       setSubmitProgress(100);
       setTimeout(() => {
         setSubmitProgress(null);
@@ -243,14 +373,13 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
         setShowResultsModal(true);
       }, 500);
       
-    } catch (e) {
+    } catch (e: any) {
       console.error("Supabase integration error:", e);
-      setSubmitProgress(100);
-      setTimeout(() => {
-        setSubmitProgress(null);
-        setFinalScoreInfo({ score: totalScore, isHighScore: true });
-        setShowResultsModal(true);
-      }, 500);
+      setSubmitProgress(null);
+      // Eliminar de localStorage de todas formas si se generó la nota
+      localStorage.removeItem(`active_exam_session_${ci}`);
+      setFinalScoreInfo({ score: totalScore, isHighScore: true });
+      setShowResultsModal(true);
     }
   };
 
@@ -294,10 +423,18 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
             {formatTime(timeLeft)}
           </div>
           <div className="flex gap-2">
+            <Button 
+              variant="secondary" 
+              onClick={handleDownloadEmergencyBackup} 
+              icon={Download}
+              title="Descarga una copia local (.md) con tus soluciones por si tienes problemas de conexión al entregar"
+            >
+              Respaldo MD
+            </Button>
             <Button variant="secondary" onClick={handleRunCode} disabled={isRunning || isSubmitting} icon={Play}>
               {isRunning ? 'Corriendo...' : 'Correr Código'}
             </Button>
-            <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting} icon={Save}>
+            <Button variant="primary" onClick={() => handleSubmit()} disabled={isSubmitting} icon={Save}>
               Entregar Examen
             </Button>
           </div>
@@ -315,7 +452,7 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
                 onClick={() => setCurrentExIndex(idx)}
                 className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${currentExIndex === idx ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
               >
-                Ej ${idx + 1}
+                Ej {idx + 1}
               </button>
             ))}
           </div>
@@ -414,7 +551,8 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
         {/* Panel Principal: Editor */}
         <div className="w-full md:w-2/3 h-[50vh] md:h-auto">
           <SecureCodeEditor 
-            editorId={`ex-${currentExIndex}-${languages[currentExIndex]}`}
+            key={`editor-${sessionId}-${currentExIndex}-${exercise.id}-${languages[currentExIndex]}`}
+            editorId={`session-${sessionId}-ex-${exercise.id}-${languages[currentExIndex]}`}
             code={codes[currentExIndex]}
             language={languages[currentExIndex]}
             onChange={handleCodeChange}
@@ -603,25 +741,36 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
             </div>
 
             {finalScoreInfo.isHighScore ? (
-              <div className="bg-emerald-950/40 text-emerald-400 px-4 py-2 rounded-lg border border-emerald-900/50 mb-8 font-medium animate-pulse">
+              <div className="bg-emerald-950/40 text-emerald-400 px-4 py-2 rounded-lg border border-emerald-900/50 mb-6 font-medium animate-pulse">
                 ¡Nuevo récord! Tu intento ha sido guardado.
               </div>
             ) : (
-              <div className="bg-slate-800 text-slate-400 px-4 py-2 rounded-lg border border-slate-700 mb-8 font-medium">
+              <div className="bg-slate-800 text-slate-400 px-4 py-2 rounded-lg border border-slate-700 mb-6 font-medium">
                 Tu nota más alta sigue siendo superior. Intento descartado.
               </div>
             )}
 
-            <Button 
-              variant="primary" 
-              className="w-full py-3"
-              onClick={() => {
-                setShowResultsModal(false);
-                onFinish();
-              }}
-            >
-              Volver al Inicio
-            </Button>
+            <div className="w-full space-y-3 mb-2">
+              <Button 
+                variant="secondary" 
+                className="w-full py-2.5 text-sm"
+                icon={FileText}
+                onClick={handleDownloadEmergencyBackup}
+              >
+                Descargar Copia de Respuestas (.md)
+              </Button>
+
+              <Button 
+                variant="primary" 
+                className="w-full py-3"
+                onClick={() => {
+                  setShowResultsModal(false);
+                  onFinish();
+                }}
+              >
+                Volver al Inicio
+              </Button>
+            </div>
           </div>
         </div>
       )}

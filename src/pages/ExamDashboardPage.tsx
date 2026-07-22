@@ -11,10 +11,12 @@ interface ExamDashboardPageProps {
 
 export const ExamDashboardPage: React.FC<ExamDashboardPageProps> = ({ onBack, onStartExam }) => {
   const [maxScore, setMaxScore] = useState<number | null>(null);
+  const [hasActiveExam, setHasActiveExam] = useState<boolean>(false);
+  const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchMaxScore = async () => {
+    const fetchMaxScoreAndActiveExam = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate('/login-estudiantes');
@@ -22,6 +24,24 @@ export const ExamDashboardPage: React.FC<ExamDashboardPageProps> = ({ onBack, on
       }
       const ci = user.email?.split('@')[0];
       if (!ci) return;
+
+      // Verificar si hay examen activo en localStorage
+      const storageKey = `active_exam_session_${ci}`;
+      const savedSessionRaw = localStorage.getItem(storageKey);
+      if (savedSessionRaw) {
+        try {
+          const savedSession = JSON.parse(savedSessionRaw);
+          const remaining = Math.max(0, Math.floor((savedSession.endTime - Date.now()) / 1000));
+          if (remaining > 0) {
+            setHasActiveExam(true);
+            setRemainingMinutes(Math.ceil(remaining / 60));
+          } else {
+            setHasActiveExam(false);
+          }
+        } catch (e) {
+          console.error("Error leyendo sesión activa de examen:", e);
+        }
+      }
 
       const { data, error } = await supabase
         .from('exam_sessions')
@@ -36,7 +56,7 @@ export const ExamDashboardPage: React.FC<ExamDashboardPageProps> = ({ onBack, on
       }
     };
 
-    fetchMaxScore();
+    fetchMaxScoreAndActiveExam();
   }, [navigate]);
 
   return (
@@ -55,6 +75,25 @@ export const ExamDashboardPage: React.FC<ExamDashboardPageProps> = ({ onBack, on
           </button>
         </div>
 
+        {hasActiveExam && (
+          <div className="bg-amber-950/40 border border-amber-500/50 rounded-xl p-4 mb-6 text-amber-200 flex items-center justify-between animate-pulse">
+            <div className="flex items-center gap-3">
+              <ShieldAlert className="text-amber-400 shrink-0" size={24} />
+              <div>
+                <p className="font-bold text-white">¡Tienes un examen activo en curso!</p>
+                <p className="text-xs text-amber-300">Te quedan aproximadamente {remainingMinutes} minutos para completarlo.</p>
+              </div>
+            </div>
+            <Button 
+              variant="primary" 
+              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shrink-0 text-sm py-2"
+              onClick={onStartExam}
+            >
+              Continuar Examen
+            </Button>
+          </div>
+        )}
+
         <div className="bg-slate-900/60 p-6 rounded-xl border border-slate-800 mb-8">
           <h2 className="text-xl font-semibold text-brand-200 mb-4 flex items-center gap-2">
             <Info size={20} />
@@ -71,11 +110,11 @@ export const ExamDashboardPage: React.FC<ExamDashboardPageProps> = ({ onBack, on
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-400 font-bold">•</span>
-              <span>Tendrás <strong>1 hora</strong> para resolver 3 ejercicios de programación aleatorios.</span>
+              <span>Tendrás <strong>1 hora</strong> para resolver 4 ejercicios de programación aleatorios.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-slate-400 font-bold">•</span>
-              <span>Si deseas eliminar un intento (por ejemplo, si te retractas del uso de IA), debes contactar directamente al profesor para el reseteo manual.</span>
+              <span>Si se corta tu conexión o recargas la página, tu avance se conservará automáticamente mientras el tiempo no haya terminado.</span>
             </li>
           </ul>
         </div>
@@ -94,15 +133,17 @@ export const ExamDashboardPage: React.FC<ExamDashboardPageProps> = ({ onBack, on
           
           <div className="flex flex-col justify-center">
             <p className="text-slate-400 mb-4 text-center md:text-left">
-              Al iniciar, el temporizador de 1 hora comenzará a correr y se te asignarán los ejercicios automáticamente.
+              {hasActiveExam 
+                ? "Haz clic en el botón para ingresar y retomar tu intento en curso." 
+                : "Al iniciar, el temporizador de 1 hora comenzará a correr y se te asignarán los ejercicios automáticamente."}
             </p>
             <Button 
               variant="primary" 
-              className="w-full py-4 text-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+              className={`w-full py-4 text-lg font-bold text-white ${hasActiveExam ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500'}`}
               icon={PlayCircle}
               onClick={onStartExam}
             >
-              Iniciar Intento
+              {hasActiveExam ? 'Continuar Examen en Curso' : 'Iniciar Intento'}
             </Button>
           </div>
         </div>
