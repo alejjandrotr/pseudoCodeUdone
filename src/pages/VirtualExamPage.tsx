@@ -11,6 +11,7 @@ interface VirtualExamPageProps {
 }
 
 import { Exercise, EXAM_EXERCISES } from '../core/data/examExercises';
+import { ErrorReporting, ErrorData } from '../components/common/ErrorReporting';
 
 export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFinish }) => {
   const [timeLeft, setTimeLeft] = useState(3600); // 1 hora = 3600s
@@ -25,6 +26,7 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
   const [submitProgress, setSubmitProgress] = useState<number | null>(null);
   const [finalScoreInfo, setFinalScoreInfo] = useState<{ score: number, isHighScore: boolean } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [errorData, setErrorData] = useState<ErrorData | null>(null);
   const navigate = useNavigate();
 
   const endTimeRef = useRef<number | null>(null);
@@ -202,8 +204,9 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
         worker.postMessage({ action: 'run_tests', language: languages[currentExIndex], code, tests: ex.publicTests });
       });
       setConsoleResults(prev => ({ ...prev, [currentExIndex]: { loading: false, data: result } }));
-    } catch (e) {
+    } catch (e: any) {
       setConsoleResults(prev => ({ ...prev, [currentExIndex]: { loading: false, error: "Error interno del evaluador." } }));
+      captureError('Correr Código', e);
     } finally {
       worker.terminate();
       setIsRunning(false);
@@ -238,18 +241,35 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
     return md;
   };
 
+  const captureError = (action: string, e: any) => {
+    const message = e instanceof Error ? e.message : String(e);
+    const backupData = generateEmergencyMarkdown();
+    setErrorData({
+      action,
+      message,
+      studentCi: studentCi || 'Desconocido',
+      backupData,
+      timestamp: new Date().toLocaleString('es-VE')
+    });
+  };
+
   const handleDownloadEmergencyBackup = () => {
-    const mdContent = generateEmergencyMarkdown();
-    const ci = studentCi || "Estudiante";
-    const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `Parcial_Emergencia_${ci}.md`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      const mdContent = generateEmergencyMarkdown();
+      const ci = studentCi || "Estudiante";
+      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Parcial_Emergencia_${ci}.md`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      console.error("Error al generar respaldo:", e);
+      captureError('Generar Respaldo MD', e);
+    }
   };
 
   const handleSubmit = async (
@@ -380,6 +400,7 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
       localStorage.removeItem(`active_exam_session_${ci}`);
       setFinalScoreInfo({ score: totalScore, isHighScore: true });
       setShowResultsModal(true);
+      captureError('Entregar Examen', e);
     }
   };
 
@@ -774,6 +795,8 @@ export const VirtualExamPage: React.FC<VirtualExamPageProps> = ({ onBack, onFini
           </div>
         </div>
       )}
+
+      <ErrorReporting errorData={errorData} onClearError={() => setErrorData(null)} />
     </div>
   );
 };
