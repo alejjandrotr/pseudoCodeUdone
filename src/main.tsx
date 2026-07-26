@@ -10,6 +10,7 @@ import { ProjectDeliveryPage } from './pages/student/ProjectDeliveryPage'
 import { ProjectDetailPage } from './pages/student/ProjectDetailPage'
 import { ExamDashboardRouted } from './pages/ExamDashboardRouted'
 import { VirtualExamRouted } from './pages/VirtualExamRouted'
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/entregar/:projectId" element={<ProjectDeliveryPage />} />
         <Route path="/parcial-virtual" element={<ExamDashboardRouted />} />
         <Route path="/parcial-virtual/examen" element={<VirtualExamRouted />} />
+        <Route path="/profesor-panel" element={<AdminDashboardPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
