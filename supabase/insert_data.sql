@@ -43,7 +43,8 @@ INSERT INTO public.students (cedula, nombres, apellidos, seccion, require_passwo
 ('12345678', 'JUAN FALSO', 'PEREZ PEREZ', '501', true)
 ON CONFLICT (cedula) DO NOTHING;
 
--- Create an initial test project
-INSERT INTO public.projects (nombre, descripcion, min_members, max_members) VALUES
-('Proyecto 1: Sistema de Inventario Básico', 'Desarrollar un sistema de inventario utilizando estructuras de control condicionales y ciclos.', 2, 4)
+-- Insert projects
+INSERT INTO public.projects (nombre, descripcion, content_url, min_members, max_members) VALUES
+('Proyecto 1: El Gran Dilema de la F.B.F.', 'Fase de grupos del Mundial de Fútbol Submarino en Fondo de Bikini. Sistema de posición, estadísticas y porcentaje de diferencia.', '/projects/p1.md', 2, 4),
+('Proyecto 2: Sistema de Atención "El Crustáceo Cascarudo"', 'Desarrollar en C un sistema informático de atención, gestión de mapa de mesas (3x12), facturación y reportes estadísticos para El Crustáceo Cascarudo.', '/projects/p2.md', 1, 3)
 ON CONFLICT DO NOTHING;

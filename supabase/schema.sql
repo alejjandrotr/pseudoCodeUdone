@@ -13,6 +13,7 @@ CREATE TABLE public.projects (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     descripcion TEXT,
+    content_url TEXT,
     min_members INTEGER DEFAULT 1,
     max_members INTEGER DEFAULT 3,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
