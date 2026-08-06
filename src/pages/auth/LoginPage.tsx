@@ -17,7 +17,11 @@ export const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const cleanCedula = cedula.trim();
+      const cleanCedula = cedula.replace(/\D/g, '');
+
+      if (!cleanCedula) {
+        throw new Error('Por favor, ingresa una cédula válida conteniendo solo números.');
+      }
 
       // Verificar primero si la cédula está registrada en la tabla de estudiantes
       const { data: studentCheck, error: checkError } = await supabase

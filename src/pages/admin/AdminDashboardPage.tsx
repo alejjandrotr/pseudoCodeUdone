@@ -15,16 +15,21 @@ export const AdminDashboardPage: React.FC = () => {
     setMessage(null);
 
     try {
+      const cleanCedula = cedula.replace(/\D/g, '');
+      if (!cleanCedula) {
+        throw new Error('Por favor, ingresa una cédula válida.');
+      }
+
       const { error } = await supabase.rpc('admin_reset_student_password', {
         admin_password: adminPassword,
-        target_cedula: cedula
+        target_cedula: cleanCedula
       });
 
       if (error) {
         throw error;
       }
 
-      setMessage({ type: 'success', text: `Contraseña para la cédula ${cedula} restablecida correctamente. El estudiante deberá iniciar sesión con su cédula como contraseña y el sistema le obligará a cambiarla.` });
+      setMessage({ type: 'success', text: `Contraseña para la cédula ${cleanCedula} restablecida correctamente. El estudiante deberá iniciar sesión con su cédula como contraseña y el sistema le obligará a cambiarla.` });
       setCedula('');
       setAdminPassword('');
     } catch (err: any) {
