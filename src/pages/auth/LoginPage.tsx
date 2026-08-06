@@ -17,7 +17,22 @@ export const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const email = `${cedula}@estudiantes.app`;
+      const cleanCedula = cedula.trim();
+
+      // Verificar primero si la cédula está registrada en la tabla de estudiantes
+      const { data: studentCheck, error: checkError } = await supabase
+        .from('students')
+        .select('cedula')
+        .eq('cedula', cleanCedula)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (!studentCheck) {
+        throw new Error('La cédula ingresada no está registrada en el sistema. Por favor, comunícate con tu profesor.');
+      }
+
+      const email = `${cleanCedula}@estudiantes.app`;
       let { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -48,10 +63,9 @@ export const LoginPage: React.FC = () => {
       const { data: student, error: studentError } = await supabase
         .from('students')
         .select('require_password_change')
-        .eq('cedula', cedula)
-        .maybeSingle(); // maybeSingle para no lanzar error si no encuentra (en caso de que la tabla esté vacía por error)
+        .eq('cedula', cleanCedula)
+        .maybeSingle(); 
 
-      // Si el estudiante no está en la tabla, lo dejamos pasar pero idealmente debería estar
       if (student?.require_password_change) {
         navigate('/cambiar-password');
       } else {

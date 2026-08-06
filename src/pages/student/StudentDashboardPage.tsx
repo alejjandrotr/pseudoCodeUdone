@@ -24,6 +24,8 @@ export const StudentDashboardPage: React.FC = () => {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [examMaxScore, setExamMaxScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notRegistered, setNotRegistered] = useState(false);
+  const [userCedula, setUserCedula] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,9 +47,17 @@ export const StudentDashboardPage: React.FC = () => {
         .from('students')
         .select('*')
         .eq('cedula', cedula)
-        .single();
+        .maybeSingle();
 
       if (studentError) throw studentError;
+
+      if (!studentData) {
+        setNotRegistered(true);
+        setUserCedula(cedula || 'Desconocido');
+        setLoading(false);
+        return;
+      }
+
       setStudent(studentData);
 
       if (studentData.require_password_change) {
@@ -113,6 +123,40 @@ export const StudentDashboardPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (notRegistered) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-slate-200">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md bg-slate-900 border border-red-500/20 p-8 rounded-2xl shadow-2xl text-center"
+        >
+          <div className="p-3 bg-red-500/10 rounded-full mb-4 border border-red-500/20 w-fit mx-auto">
+            <ShieldAlert className="w-8 h-8 text-red-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Cédula no Registrada</h2>
+          <p className="text-slate-400 mb-6 text-sm">
+            La cédula <span className="font-semibold text-slate-200">{userCedula}</span> no se encuentra en el listado de estudiantes autorizados.
+          </p>
+          <div className="bg-slate-950 border border-slate-800 p-4 rounded-lg mb-6 text-left text-xs text-slate-400 space-y-2">
+            <p className="font-bold text-slate-300">¿Qué significa esto?</p>
+            <p>El profesor debe agregarte a la base de datos antes de que puedas acceder al portal de entregas y evaluaciones.</p>
+            <p className="font-bold text-slate-300">¿Qué debes hacer?</p>
+            <p>1. Verifica si ingresaste tu cédula correctamente.</p>
+            <p>2. Si es correcta, comunícate con tu profesor para que te registre.</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 border border-slate-700"
+          >
+            <LogOut className="w-4 h-4" />
+            Cerrar Sesión / Volver
+          </button>
+        </motion.div>
       </div>
     );
   }
