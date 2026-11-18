@@ -53,9 +53,11 @@ ANÁLISIS DE SINTAXIS:
 ANÁLISIS LÓGICO:
 > [Evalúa si el algoritmo resuelve correctamente el enunciado. Explica por qué sí o por qué no.]
 
-[SIMULACIÓN — solo si la lógica es válida o parcialmente válida]
-> Input simulado: [valores inventados coherentes con el enunciado]
-> Output simulado: [resultado de ejecutar el algoritmo con esos valores]
+[SIMULACIÓN / PRUEBA DE ESCRITORIO DEL CÓDIGO DEL ESTUDIANTE]
+> Input de prueba: [valores de entrada de prueba coherentes con el enunciado]
+> Traza con el código del estudiante: [ejecuta paso a paso el código escrito por el estudiante usando ese input]
+> Output producido por su código: [resultado EXACTO que arroja el código del estudiante al ejecutarse, incluso si tiene errores lógicos o produce valores incorrectos]
+> Output esperado según enunciado: [resultado correcto que debió producir. Si difiere del output del estudiante, explica brevemente por qué falló su lógica]
 
 ----------------------------------------------
 VEREDICTO FINAL: [APROBADO | APROBADO CON OBSERVACIONES | RECHAZADO]
