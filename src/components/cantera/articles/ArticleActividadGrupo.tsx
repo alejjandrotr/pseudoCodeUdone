@@ -7,6 +7,7 @@ import { Button } from '../../common/Button';
 import { CodeBlock } from '../../common/DisplayComponents';
 import { professorsData } from '../../../core/data/professorsData';
 import { evaluarRazonamientoMundial, RazonamientoResult } from '../../../core/services/razonamientoService';
+import { getGeminiErrorMessage, getSelectedGeminiModel } from '../../../core/services/geminiConfig';
 import { analyticsService } from '../../../core/services/analyticsService';
 
 export const ArticleActividadGrupo: React.FC = () => {
@@ -94,7 +95,7 @@ export const ArticleActividadGrupo: React.FC = () => {
         professor: activeProfessor,
         cedulas: [ci1.trim(), ci2.trim(), ci3.trim()],
         respuesta: respuesta.trim()
-      }, key);
+      }, key, getSelectedGeminiModel());
 
       setEvaluationResult(result);
       localStorage.setItem(STORAGE_RESULT_KEY, JSON.stringify(result));
@@ -106,9 +107,13 @@ export const ArticleActividadGrupo: React.FC = () => {
         result.aprobado
       );
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error en la evaluación de razonamiento:", error);
-      alert("Ocurrió un error al procesar la evaluación con la IA. Por favor intenta de nuevo.");
+      const code = error?.message || "EVALUATION_FAILED";
+      alert(getGeminiErrorMessage(code));
+      if (code === "API_KEY_INVALID" || code === "API_KEY_MISSING") {
+        setIsApiKeyInputOpen(true);
+      }
     } finally {
       setIsLoading(false);
     }

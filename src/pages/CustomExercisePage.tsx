@@ -4,6 +4,11 @@ import { SettingsModal } from "../components/exercises/ExerciseComponents";
 import { Button } from "../components/common/Button";
 import { Console } from "../components/common/DisplayComponents";
 import { evaluarPseudocodigo } from "../core/services/aiEvaluationService";
+import {
+  GEMINI_API_KEY_STORAGE_KEY,
+  getGeminiErrorMessage,
+  getSelectedGeminiModel,
+} from "../core/services/geminiConfig";
 import { professorsData } from "../core/data/professorsData";
 import { useSelectedProfessor } from "../core/hooks/useSelectedProfessor";
 
@@ -23,8 +28,8 @@ export const CustomExercisePage: React.FC<CustomExercisePageProps> = ({ onBack }
   const selectedProfessor = professorsData.find(p => p.id === selectedProfId) || professorsData[0];
 
   const handleEvaluate = async () => {
-    const apiKey = localStorage.getItem("gemini_api_key");
-    const modelName = localStorage.getItem("gemini_model") || "gemini-2.5-flash";
+    const apiKey = localStorage.getItem(GEMINI_API_KEY_STORAGE_KEY);
+    const modelName = getSelectedGeminiModel();
     
     if (!apiKey) {
       setIsSettingsOpen(true);
@@ -60,11 +65,10 @@ export const CustomExercisePage: React.FC<CustomExercisePageProps> = ({ onBack }
       setConsoleOutput(response.text);
       setUsage(response.usage);
     } catch (error: any) {
-      if (error.message === "API_KEY_INVALID" || error.message === "API_KEY_MISSING") {
-        setConsoleOutput("ERROR CRÍTICO: La API Key guardada no es válida o expiró. Abre la configuración.");
+      const code = error?.message || "EVALUATION_FAILED";
+      setConsoleOutput(getGeminiErrorMessage(code));
+      if (code === "API_KEY_INVALID" || code === "API_KEY_MISSING" || code === "MODEL_NOT_FOUND") {
         setIsSettingsOpen(true);
-      } else {
-        setConsoleOutput("ERROR CRÍTICO: Falló la conexión con el motor de IA. Intenta de nuevo más tarde.");
       }
     } finally {
       setIsEvaluating(false);

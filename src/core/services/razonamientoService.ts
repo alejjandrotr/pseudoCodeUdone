@@ -1,5 +1,12 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { Professor } from "../types/professor.types";
+import {
+  DEFAULT_GEMINI_MODEL,
+  THINKING_LEVEL_FAST,
+  classifyGeminiError,
+  normalizeGeminiModel,
+  parseJsonResponse,
+} from "./geminiConfig";
 
 export interface RazonamientoRequest {
   professor: Professor;
@@ -16,16 +23,58 @@ export interface RazonamientoResult {
   recomendaciones: string[]; // Qué deberían repasar o mejorar
 }
 
+const RAZONAMIENTO_RESPONSE_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    notaTotal: {
+      type: Type.NUMBER,
+      description: "Calificación en escala 0.0 a 10.0.",
+    },
+    aprobado: {
+      type: Type.BOOLEAN,
+      description: "true si notaTotal >= 5.0, false de lo contrario.",
+    },
+    comentarioGeneral: {
+      type: Type.STRING,
+      description: "Comentario del profesor imitando su personalidad.",
+    },
+    puntosFuertes: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "Lista de aciertos en el razonamiento.",
+    },
+    puntosDebiles: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "Lista de debilidades encontradas.",
+    },
+    recomendaciones: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "Recomendaciones concretas para mejorar.",
+    },
+  },
+  required: [
+    "notaTotal",
+    "aprobado",
+    "comentarioGeneral",
+    "puntosFuertes",
+    "puntosDebiles",
+    "recomendaciones",
+  ],
+};
+
 export const evaluarRazonamientoMundial = async (
   request: RazonamientoRequest,
   apiKey: string,
-  modelName: string = "gemini-2.5-flash"
+  modelName: string = DEFAULT_GEMINI_MODEL
 ): Promise<RazonamientoResult> => {
   if (!apiKey) {
     throw new Error("API_KEY_MISSING");
   }
 
   const ai = new GoogleGenAI({ apiKey });
+  const resolvedModel = normalizeGeminiModel(modelName);
 
   const systemInstruction = `Eres un profesor evaluador de algoritmos y lógica de programación de la Universidad de Oriente (UDONE).
 Evalúas una actividad grupal en la que los estudiantes explican el razonamiento lógico para determinar el primer y segundo lugar de una clasificatoria de fútbol de 4 equipos (A, B, C, D) con desempate por diferencia de goles.
@@ -44,17 +93,7 @@ Debes imitar estrictamente la personalidad del profesor seleccionado:
 Reglas de Calificación (Escala 0.0 a 10.0, aprobación con >= 5.0):
 - Si explican correctamente cómo buscar el mayor de los puntos para el 1er lugar y el segundo mayor para el 2do lugar: +5.0 puntos.
 - Si resuelven correctamente el desempate por diferencia de goles usando condicionales 'Si (ptsA = ptsB) entonces ver diffA y diffB': +3.0 puntos.
-- Si el texto tiene coherencia lógica y estructura clara: +2.0 puntos.
-
-Debes retornar obligatoriamente un JSON estructurado de la siguiente forma sin bloques markdown de código:
-{
-  "notaTotal": number,
-  "aprobado": boolean,
-  "comentarioGeneral": string,
-  "puntosFuertes": string[],
-  "puntosDebiles": string[],
-  "recomendaciones": string[]
-}`;
+- Si el texto tiene coherencia lógica y estructura clara: +2.0 puntos.`;
 
   const userPrompt = `
 Profesor asignado: ${request.professor.name} (${request.professor.difficultyLevel})
@@ -70,39 +109,31 @@ Por favor, califica la entrega del grupo y devuelve el JSON correspondiente.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: modelName,
+      model: resolvedModel,
       contents: userPrompt,
       config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: "application/json"
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: RAZONAMIENTO_RESPONSE_SCHEMA,
+        thinkingConfig: {
+          thinkingLevel: THINKING_LEVEL_FAST,
+        },
       },
     });
 
-    const rawText = response.text ?? "";
-    const parsed = JSON.parse(rawText.trim()) as RazonamientoResult;
+    const parsed = parseJsonResponse<RazonamientoResult>(response.text ?? "");
+    const nota = Math.min(10, Math.max(0, Number(parsed.notaTotal || 0)));
 
-    // Asegurar tipos y rangos correctos
     return {
-      notaTotal: Math.min(10, Math.max(0, Number(parsed.notaTotal || 0))),
-      aprobado: parsed.notaTotal >= 5.0,
+      notaTotal: Number(nota.toFixed(1)),
+      aprobado: nota >= 5.0,
       comentarioGeneral: parsed.comentarioGeneral || "Evaluación finalizada.",
       puntosFuertes: Array.isArray(parsed.puntosFuertes) ? parsed.puntosFuertes : [],
       puntosDebiles: Array.isArray(parsed.puntosDebiles) ? parsed.puntosDebiles : [],
-      recomendaciones: Array.isArray(parsed.recomendaciones) ? parsed.recomendaciones : []
+      recomendaciones: Array.isArray(parsed.recomendaciones) ? parsed.recomendaciones : [],
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error al evaluar razonamiento grupal:", error);
-    
-    // Fallback amigable
-    const isMockApproved = request.respuesta.length > 50;
-    const mockNota = isMockApproved ? 8.5 : 3.0;
-    return {
-      notaTotal: mockNota,
-      aprobado: isMockApproved,
-      comentarioGeneral: `[Profesor Contingencia] Saludos del ${request.professor.name}. Hemos recibido tu razonamiento grupal. Hubo una interrupción en el servidor de inteligencia artificial, pero tu propuesta de lógica para la clasificatoria del mundial ha sido registrada. Consultar con tu docente en alejjandroclases@gmail.com para detalles de la corrección.`,
-      puntosFuertes: isMockApproved ? ["Entregaron a tiempo", "Describieron una idea general de comparación"] : [],
-      puntosDebiles: isMockApproved ? [] : ["La explicación es demasiado corta o ausente."],
-      recomendaciones: ["Revisar con el profesor los casos de empates complejos."]
-    };
+    throw new Error(classifyGeminiError(error));
   }
 };

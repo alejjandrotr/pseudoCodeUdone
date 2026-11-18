@@ -11,6 +11,7 @@ import { Professor } from '../../../core/types/professor.types';
 import { privateExercisesDB, parcialesConfig } from '../../../core/data/evaluacionData';
 import { professorsData } from '../../../core/data/professorsData';
 import { evaluarParcialConsolidado } from '../../../core/services/evaluacionService';
+import { getGeminiErrorMessage, getSelectedGeminiModel } from '../../../core/services/geminiConfig';
 import { analyticsService } from '../../../core/services/analyticsService';
 import { Button } from '../../common/Button';
 import { Console } from '../../common/DisplayComponents';
@@ -253,7 +254,7 @@ export const ArticleEvaluacionCore: React.FC = () => {
         professor: activeProfessor,
         ejercicios: selectedExercises,
         respuestas: respuestas
-      }, key);
+      }, key, getSelectedGeminiModel());
 
       setEvaluationResult(result);
 
@@ -294,9 +295,10 @@ export const ArticleEvaluacionCore: React.FC = () => {
 
       setGameState('results');
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calificando parcial", error);
-      alert("Hubo un error al calificar el parcial. Intenta nuevamente.");
+      const code = error?.message || "EVALUATION_FAILED";
+      alert(`${getGeminiErrorMessage(code)}\n\nTus respuestas siguen guardadas; puedes intentar calificar nuevamente.`);
       setGameState('exam');
     }
   };

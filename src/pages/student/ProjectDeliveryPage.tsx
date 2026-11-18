@@ -232,9 +232,14 @@ export const ProjectDeliveryPage: React.FC = () => {
       // 5. AI Evaluation (Si hay API Key, lo intentamos. Si falla, igual terminamos la entrega).
       if (apiKey) {
         try {
-          // LLamada manual usando fetch o SDK. Asumiendo SDK de Gemini:
-          const { GoogleGenAI } = await import('@google/genai');
+          const { GoogleGenAI, Type } = await import('@google/genai');
+          const {
+            getSelectedGeminiModel,
+            parseJsonResponse,
+            THINKING_LEVEL_BALANCED,
+          } = await import('../../core/services/geminiConfig');
           const ai = new GoogleGenAI({ apiKey });
+          const modelName = getSelectedGeminiModel();
           
           const pseudoText = await pseudoFile.text();
           const codeText = await codeFile.text();
@@ -264,38 +269,67 @@ export const ProjectDeliveryPage: React.FC = () => {
             ## EXPLICACIÓN ORAL DEL ESTUDIANTE:
             ${transcript}
             
-            Evalúa si la entrega cumple con los requerimientos del enunciado.
-            Debes responder ESTRICTAMENTE en formato JSON con la siguiente estructura:
-            {
-              "puntuacion": (numero entero del 0 al 25),
-              "analisis_errores": "descripcion de errores encontrados",
-              "ai_usage_detection": "tu opinion de si uso IA y por que",
-              "preguntas": ["pregunta1", "pregunta2", "pregunta3", "pregunta4", "pregunta5", "pregunta6", "pregunta7"]
-            }
+            Evalúa si la entrega cumple con los requerimientos del enunciado y genera exactamente 7 preguntas de defensa oral.
           `;
 
           const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: modelName,
             contents: prompt,
             config: {
               responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  puntuacion: {
+                    type: Type.INTEGER,
+                    description: "Número entero del 0 al 25.",
+                  },
+                  analisis_errores: {
+                    type: Type.STRING,
+                    description: "Descripción detallada de errores encontrados.",
+                  },
+                  ai_usage_detection: {
+                    type: Type.STRING,
+                    description: "Evaluación de si usó IA y justificación.",
+                  },
+                  preguntas: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: "Lista de 7 preguntas de defensa.",
+                  },
+                },
+                required: ["puntuacion", "analisis_errores", "ai_usage_detection", "preguntas"],
+              },
+              thinkingConfig: {
+                thinkingLevel: THINKING_LEVEL_BALANCED,
+              },
             }
           });
 
-          const aiResult = JSON.parse(response.text!);
+          const aiResult = parseJsonResponse<{
+            puntuacion: number;
+            analisis_errores: string;
+            ai_usage_detection: string;
+            preguntas: string[];
+          }>(response.text ?? "");
 
           // Guardar reporte
           await supabase.from('ai_reports').insert([{
             delivery_id: deliveryData.id,
-            puntuacion: aiResult.puntuacion,
-            analisis_errores: aiResult.analisis_errores,
-            ai_usage_detection: aiResult.ai_usage_detection,
+            puntuacion: Math.min(25, Math.max(0, Math.round(Number(aiResult.puntuacion) || 0))),
+            analisis_errores: aiResult.analisis_errores || "Sin observaciones.",
+            ai_usage_detection: aiResult.ai_usage_detection || "No determinado.",
             justificacion: "Autogenerado"
           }]);
 
           // Guardar preguntas
-          const questions = aiResult.preguntas.map((p: string) => ({ delivery_id: deliveryData.id, pregunta: p }));
-          await supabase.from('defense_questions').insert(questions);
+          const questions = (Array.isArray(aiResult.preguntas) ? aiResult.preguntas : []).map((p: string) => ({
+            delivery_id: deliveryData.id,
+            pregunta: p
+          }));
+          if (questions.length > 0) {
+            await supabase.from('defense_questions').insert(questions);
+          }
 
         } catch (aiErr) {
           console.error("Error en la IA, pero la entrega se guardó:", aiErr);

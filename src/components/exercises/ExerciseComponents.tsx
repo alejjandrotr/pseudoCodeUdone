@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Settings } from "lucide-react";
 import { Modal } from "../common/Modal";
 import { Button } from "../common/Button";
+import {
+  DEFAULT_GEMINI_MODEL,
+  GEMINI_API_KEY_STORAGE_KEY,
+  GEMINI_MODELS,
+  GEMINI_MODEL_STORAGE_KEY,
+  getSelectedGeminiModel,
+} from "../../core/services/geminiConfig";
 
 interface LanguageTabProps {
   label: string;
@@ -36,18 +43,18 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [apiKey, setApiKey] = useState("");
-  const [modelName, setModelName] = useState("gemini-2.5-flash");
+  const [modelName, setModelName] = useState<string>(DEFAULT_GEMINI_MODEL);
 
   useEffect(() => {
     if (isOpen) {
-      setApiKey(localStorage.getItem("gemini_api_key") || "");
-      setModelName(localStorage.getItem("gemini_model") || "gemini-2.5-flash");
+      setApiKey(localStorage.getItem(GEMINI_API_KEY_STORAGE_KEY) || "");
+      setModelName(getSelectedGeminiModel());
     }
   }, [isOpen]);
 
   const handleSave = () => {
-    localStorage.setItem("gemini_api_key", apiKey.trim());
-    localStorage.setItem("gemini_model", modelName);
+    localStorage.setItem(GEMINI_API_KEY_STORAGE_KEY, apiKey.trim());
+    localStorage.setItem(GEMINI_MODEL_STORAGE_KEY, modelName);
     onClose();
   };
 
@@ -68,11 +75,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             onChange={(e) => setModelName(e.target.value)}
             className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all mb-4"
           >
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recomendado/Rápido y Preciso)</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro (Máxima Inteligencia)</option>
-            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Veloz/Estable)</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legado Rápido)</option>
-            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legado Potente)</option>
+            {GEMINI_MODELS.map((model) => (
+              <option key={model.id} value={model.id}>
+                {model.label}
+              </option>
+            ))}
           </select>
           
           <div className="flex justify-between items-center mb-2">

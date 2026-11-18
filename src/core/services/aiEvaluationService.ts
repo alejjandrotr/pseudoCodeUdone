@@ -1,6 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 import { Professor } from "../types/professor.types";
-import { UDONE_RULES, getOrCreateUdoneCache } from "./udone-cache.service";
+import { buildUdoneRulesForContext } from "./udone-cache.service";
+import {
+  DEFAULT_GEMINI_MODEL,
+  THINKING_LEVEL_FAST,
+  classifyGeminiError,
+  normalizeGeminiModel,
+} from "./geminiConfig";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -64,78 +70,51 @@ export const evaluarPseudocodigo = async (
   enunciado: string,
   professor: Professor,
   apiKey: string,
-  modelName: string = "gemini-2.5-flash"
+  modelName: string = DEFAULT_GEMINI_MODEL
 ): Promise<EvaluationResult> => {
-
   if (!apiKey) {
     throw new Error("API_KEY_MISSING");
   }
 
   const ai = new GoogleGenAI({ apiKey });
+  const resolvedModel = normalizeGeminiModel(modelName);
+  const systemInstruction = buildUdoneRulesForContext(enunciado, codigoUsuario);
   const userPrompt = buildUserPrompt(codigoUsuario, enunciado, professor);
 
-  // ── Try Context Caching path (Option 1 + 2) ──────────────────────────────
-  const cacheName = await getOrCreateUdoneCache(apiKey, modelName);
-
-  if (cacheName) {
-    try {
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents: userPrompt,
-        config: {
-          cachedContent: cacheName,
-        },
-      });
-
-      const text = response.text ?? "";
-      const meta = response.usageMetadata;
-
-      return {
-        text,
-        cached: true,
-        usage: meta ? {
-          promptTokens: meta.promptTokenCount ?? 0,
-          completionTokens: meta.candidatesTokenCount ?? 0,
-          totalTokens: meta.totalTokenCount ?? 0,
-          cachedTokens: meta.cachedContentTokenCount ?? 0,
-        } : undefined,
-      };
-    } catch (err: any) {
-      // Cache may have expired mid-request — fall through to full-prompt path
-      console.warn("[evaluarPseudocodigo] Cached request failed, using fallback:", err?.message);
-    }
-  }
-
-  // ── Fallback: System Instructions path (Option 2 only) ───────────────────
   try {
     const response = await ai.models.generateContent({
-      model: modelName,
+      model: resolvedModel,
       contents: userPrompt,
       config: {
-        systemInstruction: UDONE_RULES,
+        systemInstruction,
+        thinkingConfig: {
+          thinkingLevel: THINKING_LEVEL_FAST,
+        },
       },
     });
 
-    const text = response.text ?? "";
+    const text = (response.text ?? "").trim();
+    if (!text) {
+      throw new Error("EMPTY_RESPONSE");
+    }
+
     const meta = response.usageMetadata;
+    const cachedTokens = meta?.cachedContentTokenCount ?? 0;
 
     return {
       text,
-      cached: false,
-      usage: meta ? {
-        promptTokens: meta.promptTokenCount ?? 0,
-        completionTokens: meta.candidatesTokenCount ?? 0,
-        totalTokens: meta.totalTokenCount ?? 0,
-      } : undefined,
+      cached: cachedTokens > 0,
+      usage: meta
+        ? {
+            promptTokens: meta.promptTokenCount ?? 0,
+            completionTokens: meta.candidatesTokenCount ?? 0,
+            totalTokens: meta.totalTokenCount ?? 0,
+            cachedTokens,
+          }
+        : undefined,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error evaluating pseudocode:", error);
-    if (
-      error?.message?.includes("API key not valid") ||
-      error?.message?.includes("API_KEY_INVALID")
-    ) {
-      throw new Error("API_KEY_INVALID");
-    }
-    throw new Error("EVALUATION_FAILED");
+    throw new Error(classifyGeminiError(error));
   }
 };
